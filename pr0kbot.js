@@ -1,5 +1,6 @@
 
-var config = require('./config.json');
+var Emitter = require('events').EventEmitter;
+var util = require('util');
 var net = require('net');
 
 function Bot(conf) {
@@ -9,6 +10,10 @@ function Bot(conf) {
     var con = net.createConnection(conf.port, conf.network);
     con.setEncoding('utf8');
 
+    /**
+     * Process write queue
+     * on 200ms interval
+     */
     var writeInterval = setInterval(function() {
         if (!self.writeQueue.length) { return; };
         var item = self.writeQueue.shift();
@@ -21,23 +26,25 @@ function Bot(conf) {
     con.on('close', this.log.error.bind(this));
 };
 
+util.inherits(Bot, Emitter);
+
 Bot.prototype.writeQueue = [];
 
 Bot.prototype.log = {
     in:function(msg) { 
-        console.log.apply(this, ['[ <- ]', msg])
+        console.error.apply(this, ['\u001b[1;32m', '[ <- ]', '\u001b[0m', msg]);
     },
     out:function(msg) { 
-        console.log.apply(this, ['[ -> ]', msg])
+        console.error.apply(this, ['\u001b[1;36m', '[ -> ]', '\u001b[0m', msg]);
     },
     error:function(msg) {
-        console.error.apply(this, ['\u001b[31m', msg, '\u001b[0m\n']);
+        console.error.apply(this, ['\u001b[1;31m', msg, '\u001b[0m\n']);
     }
 };
 
 Bot.prototype.write = function(msg) {
     var msg = Array.prototype.slice.call(arguments).join(' ');
-    var self = this
+    var self = this;
     this.writeQueue.push(function(con) {
         con.write(msg+'\r\n');
         self.log.out(msg);
@@ -46,15 +53,16 @@ Bot.prototype.write = function(msg) {
 
 Bot.prototype.pong = function(who) {
     this.write('PONG', ':'+who);
+    this.emit('ping', who);
 };
 
 Bot.prototype.auth = function() {
-    var config = this.config;
-    var self = this
-    setTimeout(function() {
-        self.write('NICK', config.nick_name);
-        self.write('USER', config.user_name, '8 *', ':'+config.real_name);
-    }, 2000)
+    var writeAuth = function() {
+        var config = this.config;
+        this.write('NICK', config.nick_name);
+        this.write('USER', config.user_name, '8 *', ':'+config.real_name);
+    }.bind(this);
+    setTimeout(writeAuth, 2000);
 };
 
 Bot.prototype.join = function(channel) {
@@ -80,3 +88,4 @@ Bot.prototype.parse = function(msg) {
     });
 };
 
+module.exports = Bot;
