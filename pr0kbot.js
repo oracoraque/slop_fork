@@ -25,10 +25,14 @@ function Bot(conf) {
         item.call(self, con);
     }, 200);
 
+    /**
+     * Proxy `error` and `close` events
+     */
+    con.on('error', this.emit.bind(this));
+    con.on('close', this.emit.bind(this));
+
     con.on('connect', this.auth.bind(this))
     con.on('data', this.parse.bind(this));
-    con.on('error', this.log.error.bind(this));
-    con.on('close', this.log.error.bind(this));
 };
 
 util.inherits(Bot, events.EventEmitter);
@@ -54,7 +58,7 @@ Bot.prototype.use = function(name) {
         return module(this);
     }else {
         for (key in module) {
-            this.on(key, module[key]);
+            this.on(key, module[key].bind(this));
         };
     };
 };
@@ -98,14 +102,10 @@ Bot.prototype.ajoin = function() {
 
 Bot.prototype.parse = function(msg) {
     var self = this
-    msg.split('\n').forEach(function(line) {
-
-        if (!line) { 
-            return;
-        }else if (self.config.log) {
+    msg.split('\n').slice(0, -1).forEach(function(line) {
+        if (self.config.log) {
             self.log.in(line);
         };
-
         try {
             var colons = line.split(':');
             if (/^PING/.test(colons[0])) {
@@ -125,7 +125,7 @@ Bot.prototype.parse = function(msg) {
                 };
             };
         }catch(exception){
-
+            self.emit('error', new Error('Failed to parse message'));
         };
     });
 };
