@@ -5,9 +5,10 @@ var util = require('util');
 var net = require('net');
 
 var codes = {
-    CONNECTED:'001',
-    NOTICE:'NOTICE',
-    MSG:'PRIVMSG'
+    '001': 'connect',
+    'NOTICE': 'notice',
+    'PRIVMSG': 'msg',
+    'INVITE': 'invite'
 };
 
 function Bot(conf) {
@@ -145,29 +146,26 @@ Bot.prototype.parseLine = function(line) {
                 var origins = origin.split(' ');
                 var sender = origins[0];
                 var code = origins[1];
+                var event = codes[code];
 
-                switch (code) {
-                    case codes.CONNECTED:
+                switch (event) {
+                    case 'connected':
                         this.server = sender;
                         this.ajoin();
-                        this.emit('connected', sender);
+                        this.emit(event, sender);
                         break;
-                    case codes.NOTICE:
+                    case 'server notice':
+                    case 'notice':
+                    case 'msg':
+                    case 'invite':
                         sender = this.parseSender(sender);
-                        var ev = sender.nick 
-                        ? 'notice' 
-                        : 'server notice'
-                        this.emit(ev, {
+                        this.emit(event, {
                             from:sender,
                             val:dest
                         });
                         break;
-                    case codes.MSG:
-                        sender = this.parseSender(sender);
-                        this.emit('msg', {
-                            from:sender,
-                            val:dest
-                        });
+                    case 'undefined':
+                        this.emit('unhandled', line);
                         break;
                 };
             };
