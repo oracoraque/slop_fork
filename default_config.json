@@ -6,5 +6,6 @@
   "port": 6667,
   "autojoin": [
     "#pr0k"
-  ]
+  ],
+  "log": true
 }
