@@ -4,7 +4,7 @@ var events = require('events');
 var util = require('util');
 var net = require('net');
 
-var codes = {
+const codes = {
     CONNECTED:'001',
     NOTICE:'NOTICE',
     MSG:'PRIVMSG'
@@ -107,6 +107,28 @@ Bot.prototype.ajoin = function() {
     };
 };
 
+Bot.prototype.parseSender = function(msg) {
+    try {
+        msg = msg.split('!');
+        if (msg.length === 1) {
+            return { host:msg[0] };
+        };
+        var nick = msg[0];
+        var host = msg[1];
+        var at = host.indexOf('@');
+        var user = host.substring(0, at).replace(/^~/, '');
+        host = host.substring(at+1);
+
+        return {
+            nick:nick,
+            user:user,
+            host:host
+        }
+    }catch(exception) {
+        this.emit('error', exception);
+    };
+};
+
 Bot.prototype.parseLine = function(line) {
     try {
         if (!line) { return };
@@ -115,8 +137,7 @@ Bot.prototype.parseLine = function(line) {
         var colons = line.split(':');
 
         if (/^PING/.test(colons[0])) {
-            this.pong(colons[1]);
-            this.emit('ping', who);
+            this.emit('ping', colons[1]);
         }else {
             var origin = colons[1];
             var dest = colons[2];
@@ -125,25 +146,41 @@ Bot.prototype.parseLine = function(line) {
                 var sender = origins[0];
                 var code = origins[1];
 
-                if (code === codes.CONNECTED) {
-                    this.server = sender;
-                    this.ajoin();
-                    this.emit('connected', sender);
-                }else if (code === codes.NOTICE) {
-                    this.emit('notice', sender, dest);
-                }else if (code === codes.MSG) {
-                    this.emit('msg', sender, dest);
+                switch (code) {
+                    case codes.CONNECTED:
+                        this.server = sender;
+                        this.ajoin();
+                        this.emit('connected', sender);
+                        break;
+                    case codes.NOTICE:
+                        sender = this.parseSender(sender);
+                        var ev = sender.nick 
+                        ? 'notice' 
+                        : 'server notice'
+                        this.emit(ev, {
+                            from:sender,
+                            val:dest
+                        });
+                        break;
+                    case codes.MSG:
+                        sender = this.parseSender(sender);
+                        this.emit('msg', {
+                            from:sender,
+                            val:dest
+                        });
+                        break;
                 };
             };
         };
     }catch(exception){
-        this.emit('error', new Error('Failed to parse message'));
+        this.emit('error',
+        new Error('Failed to parse message'));
     };
 };
 
 Bot.prototype.parse = function(msg) {
     var parseLine = this.parseLine.bind(this);
-    msg.split('\n').slice(0, -1).forEach(parseLine);
+    msg.split('\r\n').slice(0, -1).forEach(parseLine);
 };
 
 module.exports = Bot;
