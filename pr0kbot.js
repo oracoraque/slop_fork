@@ -180,8 +180,7 @@ Bot.prototype.parseLine = function(line) {
             };
         };
     }catch(exception){
-        this.emit('error',
-        new Error('Failed to parse message'));
+        this.emit('error', exception);
     };
 };
 
