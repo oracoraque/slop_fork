@@ -42,7 +42,9 @@ util.inherits(Bot, events.EventEmitter);
 Bot.prototype.writeQueue = [];
 
 Bot.prototype.log = function(type, msg) {
-    if (!this.config.log) {
+    var log = this.config.log;
+
+    if (!log || (typeof log === 'string' && type !== log)) {
         return;
     };
 
