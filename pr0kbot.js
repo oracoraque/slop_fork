@@ -147,6 +147,7 @@ Bot.prototype.parseLine = function(line) {
                 var sender = origins[0];
                 var code = origins[1];
                 var event = codes[code];
+                var recip = origins[2];
 
                 switch (event) {
                     case 'connected':
@@ -154,15 +155,23 @@ Bot.prototype.parseLine = function(line) {
                         this.ajoin();
                         this.emit(event, sender);
                         break;
-                    case 'server notice':
                     case 'notice':
                     case 'msg':
                     case 'invite':
-                        sender = this.parseSender(sender);
-                        this.emit(event, {
-                            from:sender,
+                        var res = {
+                            from:this.parseSender(sender),
+                            to:recip,
                             val:dest
-                        });
+                        };
+
+                        this.emit(event, res);
+
+                        if (/^#/.test(recip)) {
+                            this.emit('channel '+event, res);
+                        }else if (!res.from.nick) {
+                            this.emit('server '+event, res); 
+                        };
+
                         break;
                     case 'undefined':
                         this.emit('unhandled', line);
