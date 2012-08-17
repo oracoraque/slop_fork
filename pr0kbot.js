@@ -1,5 +1,6 @@
 
-var Emitter = require('events').EventEmitter;
+var path = require('path');
+var events = require('events');
 var util = require('util');
 var net = require('net');
 
@@ -30,7 +31,7 @@ function Bot(conf) {
     con.on('close', this.log.error.bind(this));
 };
 
-util.inherits(Bot, Emitter);
+util.inherits(Bot, events.EventEmitter);
 
 Bot.prototype.writeQueue = [];
 
@@ -46,12 +47,26 @@ Bot.prototype.log = {
     }
 };
 
+Bot.prototype.use = function(name) {
+    name = path.resolve(name);
+    var module = require(name);
+    if (typeof module === 'function') {
+        return module(this);
+    }else {
+        for (key in module) {
+            this.on(key, module[key]);
+        };
+    };
+};
+
 Bot.prototype.write = function(msg) {
     var msg = Array.prototype.slice.call(arguments).join(' ');
     var self = this;
     this.writeQueue.push(function(con) {
         con.write(msg+'\r\n');
-        self.log.out(msg);
+        if (self.config.log) {
+            self.log.out(msg);
+        };
     })
 };
 
@@ -84,9 +99,14 @@ Bot.prototype.ajoin = function() {
 Bot.prototype.parse = function(msg) {
     var self = this
     msg.split('\n').forEach(function(line) {
-        if (!line) { return };
-        try {
+
+        if (!line) { 
+            return;
+        }else if (self.config.log) {
             self.log.in(line);
+        };
+
+        try {
             var colons = line.split(':');
             if (/^PING/.test(colons[0])) {
                 self.pong(colons[1]);
@@ -99,8 +119,9 @@ Bot.prototype.parse = function(msg) {
                 var code = origins[1];
 
                 if (code === codes.CONNECTED) {
+                    self.server = sender;
                     self.ajoin();
-                    self.emit('connected');
+                    self.emit('connected', sender);
                 };
             };
         }catch(exception){
