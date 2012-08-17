@@ -4,7 +4,7 @@ var events = require('events');
 var util = require('util');
 var net = require('net');
 
-const codes = {
+var codes = {
     CONNECTED:'001',
     NOTICE:'NOTICE',
     MSG:'PRIVMSG'
@@ -65,7 +65,7 @@ Bot.prototype.use = function(name) {
     name = path.resolve(name);
     var module = require(name);
     if (typeof module === 'function') {
-        return module(this);
+        return module.call(this, this);
     }else {
         for (key in module) {
             this.on(key, module[key].bind(this));
