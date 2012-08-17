@@ -1,0 +1,10 @@
+{
+  "nick_name": "somn",
+  "user_name": "somn",
+  "real_name": "somn",
+  "network": "irc.synirc.net",
+  "port": 6667,
+  "autojoin": [
+    "#pr0k"
+  ]
+}
