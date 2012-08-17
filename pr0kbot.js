@@ -4,8 +4,10 @@ var events = require('events');
 var util = require('util');
 var net = require('net');
 
-const codes = {
-    CONNECTED:'001'
+var codes = {
+    CONNECTED:'001',
+    NOTICE:'NOTICE',
+    MSG:'PRIVMSG'
 };
 
 function Bot(conf) {
@@ -39,16 +41,22 @@ util.inherits(Bot, events.EventEmitter);
 
 Bot.prototype.writeQueue = [];
 
-Bot.prototype.log = {
-    in:function(msg) { 
-        console.error.apply(this, ['\u001b[1;32m', '[ <- ]', '\u001b[0m', msg]);
-    },
-    out:function(msg) { 
-        console.error.apply(this, ['\u001b[1;36m', '[ -> ]', '\u001b[0m', msg]);
-    },
-    error:function(msg) {
-        console.error.apply(this, ['\u001b[1;31m', msg, '\u001b[0m\n']);
-    }
+Bot.prototype.log = function(type, msg) {
+    if (!this.config.log) {
+        return;
+    };
+
+    var args = [];
+
+    if (type === 'in') {
+        args.unshift('\u001b[1;32m', '[ <- ]', '\u001b[0m', msg);
+    }else if (type === 'out') {
+        args.unshift('\u001b[1;36m', '[ -> ]', '\u001b[0m', msg);
+    }else if (type === 'error') {
+        args.unshift('\u001b[1;31m', msg, '\u001b[0m\n');
+    };
+
+    console.error.apply(this, args);
 };
 
 Bot.prototype.use = function(name) {
@@ -68,15 +76,12 @@ Bot.prototype.write = function(msg) {
     var self = this;
     this.writeQueue.push(function(con) {
         con.write(msg+'\r\n');
-        if (self.config.log) {
-            self.log.out(msg);
-        };
+        self.log('out', msg);
     })
 };
 
 Bot.prototype.pong = function(who) {
     this.write('PONG', ':'+who);
-    this.emit('ping', who);
 };
 
 Bot.prototype.auth = function() {
@@ -100,34 +105,43 @@ Bot.prototype.ajoin = function() {
     };
 };
 
-Bot.prototype.parse = function(msg) {
-    var self = this
-    msg.split('\n').slice(0, -1).forEach(function(line) {
-        if (self.config.log) {
-            self.log.in(line);
-        };
-        try {
-            var colons = line.split(':');
-            if (/^PING/.test(colons[0])) {
-                self.pong(colons[1]);
-            }else {
-                var origin = colons[1];
-                var destination = colons[2];
+Bot.prototype.parseLine = function(line) {
+    try {
+        if (!line) { return };
+        this.log('in', line);
 
+        var colons = line.split(':');
+
+        if (/^PING/.test(colons[0])) {
+            this.pong(colons[1]);
+            this.emit('ping', who);
+        }else {
+            var origin = colons[1];
+            var dest = colons[2];
+            if (origin) {
                 var origins = origin.split(' ');
                 var sender = origins[0];
                 var code = origins[1];
 
                 if (code === codes.CONNECTED) {
-                    self.server = sender;
-                    self.ajoin();
-                    self.emit('connected', sender);
+                    this.server = sender;
+                    this.ajoin();
+                    this.emit('connected', sender);
+                }else if (code === codes.NOTICE) {
+                    this.emit('notice', sender, dest);
+                }else if (code === codes.MSG) {
+                    this.emit('msg', sender, dest);
                 };
             };
-        }catch(exception){
-            self.emit('error', new Error('Failed to parse message'));
         };
-    });
+    }catch(exception){
+        this.emit('error', new Error('Failed to parse message'));
+    };
+};
+
+Bot.prototype.parse = function(msg) {
+    var parseLine = this.parseLine.bind(this);
+    msg.split('\n').slice(0, -1).forEach(parseLine);
 };
 
 module.exports = Bot;
