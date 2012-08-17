@@ -3,6 +3,10 @@ var Emitter = require('events').EventEmitter;
 var util = require('util');
 var net = require('net');
 
+const codes = {
+    CONNECTED:'001'
+};
+
 function Bot(conf) {
     this.config = conf;
     var self = this;
@@ -71,8 +75,9 @@ Bot.prototype.join = function(channel) {
 
 Bot.prototype.ajoin = function() {
     var autojoin = this.config.autojoin;
+    var join = this.join.bind(this);
     if (autojoin && autojoin instanceof Array) {
-        autojoin.forEach(this.join);
+        autojoin.forEach(join);
     };
 };
 
@@ -80,10 +85,26 @@ Bot.prototype.parse = function(msg) {
     var self = this
     msg.split('\n').forEach(function(line) {
         if (!line) { return };
-        self.log.in(line);
-        var colons = line.split(':');
-        if (/^PING/.test(colons[0])) {
-            self.pong(colons[1]);
+        try {
+            self.log.in(line);
+            var colons = line.split(':');
+            if (/^PING/.test(colons[0])) {
+                self.pong(colons[1]);
+            }else {
+                var origin = colons[1];
+                var destination = colons[2];
+
+                var origins = origin.split(' ');
+                var sender = origins[0];
+                var code = origins[1];
+
+                if (code === codes.CONNECTED) {
+                    self.ajoin();
+                    self.emit('connected');
+                };
+            };
+        }catch(exception){
+
         };
     });
 };
