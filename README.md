@@ -25,3 +25,43 @@ Modify configuration in `config.json`
 + `autojoin` List of channels to autojoin, e.g. `[ '#mychannel' ]`
 
 + `log` Whether or not to log input / output. Option may be boolean `true / false` or a string `in / out`.
+
+## Bot commands
+
++ write
+
++ msg
+
++ notice
+
++ join
+
+## Modules
+
+There are two very simple module formats.
+
+```js
+module.exports = {
+    event1:function() {
+        /* handle event */
+    },
+    event2:function() {
+        /* handle event */
+    }
+};
+```
+
+And the more liberal:
+
+```js
+module.exports = function(con) {
+    this.on('event1', function() {
+        /* handle event */
+    })
+
+    this.on('event2', function() {
+        /* handle event */
+    })
+}
+```
+
