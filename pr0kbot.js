@@ -5,10 +5,10 @@ var util = require('util');
 var net = require('net');
 
 var codes = {
-    '001': 'connect',
-    'NOTICE': 'notice',
-    'PRIVMSG': 'msg',
-    'INVITE': 'invite'
+    '001':      'connect',
+    'NOTICE':   'notice',
+    'PRIVMSG':  'msg',
+    'INVITE':   'invite'
 };
 
 function Bot(conf) {
@@ -41,6 +41,7 @@ function Bot(conf) {
 util.inherits(Bot, events.EventEmitter);
 
 Bot.prototype.writeQueue = [];
+Bot.prototype.modules = [];
 
 Bot.prototype.log = function(type, msg) {
     var log = this.config.log;
@@ -62,9 +63,32 @@ Bot.prototype.log = function(type, msg) {
     console.error.apply(this, args);
 };
 
+Bot.prototype.getModule = function(name, fn) {
+    var modules = this.modules
+    for (var i=0, len=modules.length;i<len;i++) {
+        var module = modules[i]
+        if (module.name === name 
+            || module.name.split('/').pop() === name) 
+            {
+                if (fn) {
+                    return fn(null, module.module);
+                }else {
+                    return module.module;
+                };
+            };
+    };
+    return new Error('No such module');
+};
+
 Bot.prototype.use = function(name) {
     name = path.resolve(name);
     var module = require(name);
+
+    this.modules.push({
+        name:name.replace(/\.js$/, ''),
+        module:module
+    });
+
     if (typeof module === 'function') {
         return module.call(this, this);
     }else {
@@ -94,6 +118,14 @@ Bot.prototype.auth = function() {
         this.write('USER', config.user_name, '8 *', ':'+config.real_name);
     }.bind(this);
     setTimeout(writeAuth, 2000);
+};
+
+Bot.prototype.msg = function(recip, what) {
+    this.write('PRIVMSG', recip, ':'+what);
+};
+
+Bot.prototype.notice = function(recip, what) {
+    this.write('NOTICE', recip, ':'+what);
 };
 
 Bot.prototype.join = function(channel) {
@@ -158,8 +190,11 @@ Bot.prototype.parseLine = function(line) {
                     case 'notice':
                     case 'msg':
                     case 'invite':
+                        dest = colons.slice(2).join(':');
+                        sender = this.parseSender(sender);
+
                         var res = {
-                            from:this.parseSender(sender),
+                            from:sender,
                             to:recip,
                             val:dest
                         };
