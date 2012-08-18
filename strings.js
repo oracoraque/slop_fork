@@ -14,3 +14,7 @@ String.prototype.endsWith = function(str) {
 String.prototype.contains = function(str) {
     return this.indexOf(str) !== -1;
 };
+
+String.prototype.equals = function(str) {
+    return this === str;
+};
