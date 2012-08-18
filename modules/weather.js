@@ -81,7 +81,7 @@ Weather.prototype.flattenedFigures = (function() {
 })();
 
 Weather.prototype.testProps = function(o) {
-    var keys = Object.keys(this.flattenedFigures);
+    var keys = this.flattenedFigures;
     return keys.every(function(i) {
         return o.hasOwnProperty(i);
     });
