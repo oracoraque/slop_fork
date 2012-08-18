@@ -118,4 +118,20 @@ module.exports = function(bot) {
 
 ## Module example
 
-Simply place your module in the `/modules` directory, or call the `bot.load(path)` function manually, somewhere in your code.
+Simply place your module in the `/modules` directory, or call the `bot.load(path)` function manually, somewhere in your code. In this example we will make a command module for unloading another module.
+
+```js
+module.exports = function(bot) {
+    bot.on('.unload', function(req, res) {
+        var module = req.val.substring(8);        
+        if (!module) { return }
+        bot.unload(module, function(err) {
+            if (err) {
+                res('Failed to unload module '+module);
+            }else {
+                res('Unloaded module '+module);
+            };
+        });
+    });
+};
+```
