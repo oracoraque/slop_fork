@@ -32,24 +32,19 @@ Modify configuration in `config.json`
 + `notice`
 + `server notice`
 + `channel notice`
-
 + `join`
 + `part`
 + `quit`
-
 + `msg`
 + `server msg`
 + `channel msg`
-
 + `mode`
 + `channel mode`
 + `user mode`
-
 + `mute`
 + `unmute`
 + `inviteonly`
 + `deinviteonly`
-
 + `voice`
 + `devoice`
 + `halfop`
