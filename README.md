@@ -45,6 +45,8 @@ Modify configuration in `config.json`
 
 ## Commands
 
+These commands exist for the bot:
+
 + `write` Writes raw commands to the server
 + `msg` Sends PRIVMSG to channel or user
 + `notice` Sends NOTICE to channel or user
@@ -58,7 +60,7 @@ Modify configuration in `config.json`
 
 ## Events
 
-You may listen for any of these events. Also support for arbitrary modes, defined +mode -mode e.g. `+v`. The `msg` event consumes both channel and user messages. The `channel msg` event consumes only channel messages,  `user msg` applies to only user messages, and so forth. This rule apples to `msg`, `notice`, and `mode`.
+You may listen for any of these events. Also support for arbitrary modes, defined +mode -mode e.g. `+v`. The `msg` event consumes both channel and user messages. The `channel msg` event consumes only channel messages,  `user msg` applies to only user messages, and so forth. This rule apples to `msg`, `notice`, and `mode`. You may also listen for commands by name, e.g. `.we` or `.g`. Configure the command prefix in `config.json`.
 
 + `connect`
 + `notice`
