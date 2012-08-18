@@ -290,8 +290,8 @@ Bot.prototype.parseLine = function(line) {
 
                 var prefix = this.prefix;
                 if (dest.startsWith(prefix)) {
-                    var sub = dest.substring(0, dest.indexOf(prefix));
-                    this.emit(dest, req, res);
+                    var sub = dest.substring(0, dest.indexOf(' '));
+                    this.emit(sub, req, res);
                 };
 
                 if (toChan) {
