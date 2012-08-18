@@ -1,0 +1,12 @@
+{
+    "name" : "pr0kbot",
+    "version" : "0.0.1",
+    "description" : "IRC bot for #pr0k",
+    "repository" : {
+        "type" : "git",
+        "url" : "git://github.com/Ond/pr0kbot.git"
+    },
+    "author" : {
+        "name" : "Ond"
+    }
+}
