@@ -13,8 +13,12 @@ An IRC bot for #pr0k, written in node, using Redis.
 ```code
 git clone https://github.com/Ond/pr0kbot
 ```
-2. Modify `config.json` to your desire. 
-3. Run server:
+2. cd into directory and npm install:
+```code
+cd pr0kbot; npm install ./
+```
+3. Modify `config.json` to your desire. 
+4. Run server:
 ```code
 node run
 ```
