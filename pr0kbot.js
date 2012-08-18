@@ -6,6 +6,7 @@ var net = require('net');
 
 var codes = {
     '001':      'connect',
+    '433':      'nick in use',
     'NOTICE':   'notice',
     'PRIVMSG':  'msg',
     'INVITE':   'invite',
@@ -138,6 +139,10 @@ Bot.prototype.auth = function() {
     setTimeout(writeAuth, 2000);
 };
 
+Bot.prototype.identify = function(pass) {
+    this.msg('NickServ', 'identify '+pass);
+};
+
 Bot.prototype.msg = function(recip, what) {
     this.write('PRIVMSG', recip, ':'+what);
 };
@@ -205,6 +210,7 @@ Bot.prototype.parseLine = function(line) {
                         this.ajoin();
                         this.emit(event, sender);
                         break;
+                    case 'nick in use':
                     case 'notice':
                     case 'msg':
                     case 'invite':
@@ -229,6 +235,10 @@ Bot.prototype.parseLine = function(line) {
                             this.emit('channel '+event, res);
                         }else if (!res.from.nick) {
                             this.emit('server '+event, res); 
+                        };
+
+                        if (parseInt(code)) {
+                            this.emit(code, res);
                         };
 
                         break;
