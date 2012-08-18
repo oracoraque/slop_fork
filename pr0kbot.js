@@ -31,8 +31,11 @@ var modes = {
     '-i': 'deinviteonly'
 };
 
-function Bot(conf) { this.config = conf;
+function Bot(conf) { 
     var self = this;
+
+    this.config = conf;
+    this.prefix = conf.command_prefix;
 
     var con = net.createConnection(conf.port, conf.network);
     con.setEncoding('utf8');
@@ -285,8 +288,9 @@ Bot.prototype.parseLine = function(line) {
 
                 this.emit(event, req, res);
 
-                if (dest[0] === '.') {
-                    var sub = dest.substring(0, dest.indexOf(' '));
+                var prefix = this.prefix;
+                if (dest.startsWith(prefix)) {
+                    var sub = dest.substring(0, dest.indexOf(prefix));
                     this.emit(dest, req, res);
                 };
 
