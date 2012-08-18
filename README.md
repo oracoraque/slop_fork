@@ -33,6 +33,10 @@ Modify configuration in `config.json`
 + `server notice`
 + `channel notice`
 
++ `join`
++ `part`
++ `quit`
+
 + `msg`
 + `server msg`
 + `channel msg`
@@ -54,6 +58,8 @@ Modify configuration in `config.json`
 + `deop`
 + `ban`
 + `unban`
+
+Also support for arbitrary modes, defined +mode -mode e.g. `+v`
 
 ## Modules
 
