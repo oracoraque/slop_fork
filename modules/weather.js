@@ -99,18 +99,14 @@ Weather.prototype.format = function(o) {
 };
 
 module.exports = function(bot) {
-    bot.on('channel msg', function(req) {
-        if (!req.val.startsWith('.we ')) {
-            return;
-        };
-        var channel = req.channel;
-        var nick = req.from.nick+': ';
+    bot.on('channel msg', function(req, res) {
+        if (!req.val.startsWith('.we ')) { return; };
         var query = req.val.substring(4);
-        new Weather(query, function(err, res) {
+        var weather = new Weather(query, function(err, data) {
             if (!err && res) {
-                bot.msg(channel, nick+res);
+                res(data);
             }else {
-                bot.msg(channel, nick+'please try again');
+                res('Please try again');
             };
         });
     });
