@@ -52,10 +52,13 @@ Modify configuration in `config.json`
 + `part` Parts channel
 + `auth` Sends NICK / USER to server
 + `identify` Identifies with NickServ
++ `load` Use a module at the given path (Alias: use)
++ `unload` Unload a module with provided name
++ `getModule` Returns a given module, so you can conceivably interact with it
 
 ## Events
 
-You may listen for any of these events. Also support for arbitrary modes, defined +mode -mode e.g. `+v`
+You may listen for any of these events. Also support for arbitrary modes, defined +mode -mode e.g. `+v`. The `msg` event consumes both channel and user messages. The `channel msg` event consumes only channel messages,  `user msg` applies to only user messages, and so forth. This rule apples to `msg`, `notice`, and `mode`.
 
 + `connect`
 + `notice`
@@ -113,4 +116,4 @@ module.exports = function(bot) {
 
 ## Module example
 
-Simply place your module in the `/modules` directory, or call the `bot.use(modulename)` function manually, somewhere in your code.
+Simply place your module in the `/modules` directory, or call the `bot.load(path)` function manually, somewhere in your code.
