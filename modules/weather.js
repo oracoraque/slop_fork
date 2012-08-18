@@ -21,21 +21,15 @@ function Weather(query, fn) {
 
     parser.on('error', fn);
     parser.on('opentag', function(node) {
-        try {
-            var name = node.name;
-            if (name === 'CITY') {
-                return weather[name] = node.attributes.DATA;
+        var name = node.name;
+        if (name === 'CITY') {
+            weather[name] = node.attributes.DATA;
+        }else if (self.parents[name]) {
+            tag = true;
+        }else if (tag) {
+            if (self.figures[name]) {
+                weather[name] = node.attributes.DATA;
             };
-
-            if (self.parents[name]) {
-                tag = true;
-            }else if (tag) {
-                if (self.figures[name]) {
-                    weather[name] = node.attributes.DATA;
-                };
-            };
-        }catch(exception) {
-            return fn(exception);
         };
     });
 
