@@ -127,11 +127,14 @@ Bot.prototype.load = function(name) {
     };
 };
 
-Bot.prototype.unload = function(name) {
+Bot.prototype.unload = function(name, fn) {
     var modules = this.modules;
     this.getModule(name, function(err, module, index) {
         if (!err && module) {
-           modules.splice(index, 1); 
+            modules.splice(index, 1); 
+            if (fn) { fn(null, 'ok'); };
+        }else if (fn) {
+            fn(new Error('Module not exist'));
         };
     });
 };
