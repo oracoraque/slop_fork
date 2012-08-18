@@ -91,7 +91,7 @@ Bot.prototype.getModule = function(name, fn) {
         if (module.name === name 
             || module.name.split('/').pop() === name) {
                 if (fn) {
-                    return fn(null, module.module);
+                    return fn(null, module.module, i);
                 }else {
                     return module.module;
                 };
@@ -105,7 +105,8 @@ Bot.prototype.getModule = function(name, fn) {
     };
 };
 
-Bot.prototype.use = function(name) {
+Bot.prototype.use = 
+Bot.prototype.load = function(name) {
     name = path.resolve(name);
     var module = require(name);
 
@@ -121,6 +122,15 @@ Bot.prototype.use = function(name) {
             this.on(key, module[key].bind(this));
         };
     };
+};
+
+Bot.prototype.unload = function(name) {
+    var modules = this.modules;
+    this.getModule(name, function(err, module, index) {
+        if (!err && module) {
+           modules.splice(index, 1); 
+        };
+    });
 };
 
 Bot.prototype.write = function(msg) {
