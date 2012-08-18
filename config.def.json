@@ -8,5 +8,7 @@
   "autojoin": [
     "#pr0k"
   ],
-  "log": true
+  "log": true,
+  "command_prefix":".",
+  "master":"Functor"
 }
