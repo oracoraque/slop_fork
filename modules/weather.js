@@ -103,7 +103,7 @@ module.exports = function(bot) {
         if (!req.val.startsWith('.we ')) { return; };
         var query = req.val.substring(4);
         var weather = new Weather(query, function(err, data) {
-            if (!err && res) {
+            if (!err && data) {
                 res(data);
             }else {
                 res('Please try again');
