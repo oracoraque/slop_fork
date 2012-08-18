@@ -267,8 +267,8 @@ Bot.prototype.parseLine = function(line) {
             case 'part':
                 dest = colons.slice(2).join(':');
                 sender = this.parseSender(sender);
-                var toChan = /^#/.test(args[0]);
 
+                var toChan = /^#/.test(args[0]);
                 var req = {
                     from:sender,
                     args:args,
@@ -284,6 +284,11 @@ Bot.prototype.parseLine = function(line) {
                 var res = this.res.bind(this, req);
 
                 this.emit(event, req, res);
+
+                if (dest[0] === '.') {
+                    var sub = dest.substring(0, dest.indexOf(' '));
+                    this.emit(dest, req, res);
+                };
 
                 if (toChan) {
                     this.emit('channel '+event, req, res);
