@@ -295,9 +295,13 @@ Bot.prototype.parseLine = function(line) {
                 if (dest.startsWith(prefix)) {
                     var inds = dest.indexOf(' ');
                     var sub = dest;
+                    var argv = [];
                     if (inds !== -1) {
                         sub = dest.substring(0, inds);
+                        argv = dest.substring(inds+1).split(' ');
                     };
+                    req.command = sub;
+                    req.argv = argv;
                     this.emit(sub, req, res);
                 };
 
