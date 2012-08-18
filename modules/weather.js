@@ -1,83 +1,101 @@
 
 /**
- * Retrieves whether data
+ * Retrieves weather data
  * using hidden Google API
  *
- * XML parsing is ridiculous
+ * Command signature: 
+ * .we <args>
  */
 
 var http = require('http');
 var sax = require('sax');
 
 function Weather(query, fn) {
+    var self = this;
     var parser = sax.createStream();
     var weather = {};
-    var tag = false;
-    var self = this;
-    var options = {
-        host:'www.google.com',
-        path:'/ig/api?weather='+escape(query)
-    };
+    var parent = false;
 
     parser.on('error', fn);
     parser.on('opentag', function(node) {
         var name = node.name;
-        if (name === 'CITY') {
+        var figure = self.figures[name];
+        if (!parent && figure) {
+            parent = figure;
+        }else if (name === 'CITY' || (parent && parent[name])) {
             weather[name] = node.attributes.DATA;
-        }else if (self.parents[name]) {
-            tag = true;
-        }else if (tag) {
-            if (self.figures[name]) {
-                weather[name] = node.attributes.DATA;
-            };
         };
     });
 
     parser.on('closetag', function(node) {
-        if (self.parents[node]) {
-            tag = false;
+        if (self.figures[node]) {
+            parent = false;
         };
     });
 
     parser.on('end', function() {
         if (!self.testProps(weather)) {
-            return fn(new Error('Invalid req'));
-        };
-        var res = [
-            weather.CITY+': '+weather.CONDITION,
-            weather.TEMP_F+'F/'+weather.TEMP_C+'C',
-            '(H:'+weather.HIGH+'F', 'L:'+weather.LOW+'F)',
-            weather.HUMIDITY,
-            weather.WIND_CONDITION
-        ].join('; ');
-        return fn(null, res);
+            fn(new Error('Invalid req'));
+        }else {
+            fn(null, self.format(weather));
+        }
     });
+
+    var options = {
+        host:'www.google.com',
+        path:'/ig/api?weather='+escape(query)
+    };
 
     http.request(options, function(res) {
         res.pipe(parser);
     }).end();
 };
 
+/**
+ * Attach desired tags
+ * and their parents
+ * to the prototype
+ */
+
 Weather.prototype.figures = {
-    'CONDITION':       true,
-    'TEMP_F':          true,
-    'TEMP_C':          true,
-    'HUMIDITY':        true,
-    'WIND_CONDITION':  true,
-    'HIGH':            true,
-    'LOW':             true
+    'CURRENT_CONDITIONS':   {
+        'CONDITION':       true,
+        'TEMP_F':          true,
+        'TEMP_C':          true,
+        'HUMIDITY':        true,
+        'WIND_CONDITION':  true,
+    },
+    'FORECAST_CONDITIONS':  {
+        'HIGH':            true,
+        'LOW':             true
+    }
 };
 
-Weather.prototype.parents = {
-    'CURRENT_CONDITIONS':   true,
-    'FORECAST_CONDITIONS':  true
-};
+Weather.prototype.flattenedFigures = (function() {
+    var figures = Weather.prototype.figures;
+    var flat = [];
+    for (key in figures) {
+        flat.concat(Object.keys(figures[key]));
+    };
+    return flat;
+})();
 
 Weather.prototype.testProps = function(o) {
-    var keys = Object.keys(this.figures);
+    var keys = Object.keys(this.flattenedFigures);
     return keys.every(function(i) {
         return o.hasOwnProperty(i);
     });
+};
+
+Weather.prototype.format = function(o) {
+    var res =  [
+        o.CITY+': '+o.CONDITION,
+        o.TEMP_F+'F/'+o.TEMP_C+'C',
+        '(H:'+o.HIGH+'F', 'L:'+o.LOW+'F)',
+        o.HUMIDITY,
+        o.WIND_CONDITION
+    ].join('; ');
+    return res;
 };
 
 module.exports = function(bot) {
@@ -92,7 +110,7 @@ module.exports = function(bot) {
             if (!err && res) {
                 bot.msg(channel, nick+res);
             }else {
-                bot.msg(channel, nick+'Couldn\'t fetch weather data for \''+query+'\', try using a zip or postal code.');
+                bot.msg(channel, nick+'please try again');
             };
         });
     });
