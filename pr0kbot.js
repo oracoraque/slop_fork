@@ -232,6 +232,7 @@ Bot.prototype.parseLine = function(line) {
                         this.emit(event, res);
 
                         if (/^#/.test(recip)) {
+                            res.channel = recip;
                             this.emit('channel '+event, res);
                         }else if (!res.from.nick) {
                             this.emit('server '+event, res); 
