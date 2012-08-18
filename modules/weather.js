@@ -99,8 +99,7 @@ Weather.prototype.format = function(o) {
 };
 
 module.exports = function(bot) {
-    bot.on('channel msg', function(req, res) {
-        if (!req.val.startsWith('.we ')) { return; };
+    bot.on('.we', function(req, res) {
         var query = req.val.substring(4);
         var weather = new Weather(query, function(err, data) {
             if (!err && data) {
