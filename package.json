@@ -10,6 +10,7 @@
     },
     "main": "pr0kbot.js",
     "dependencies": {
-        "redis": "latest"
+        "redis": "latest",
+        "sax":"latest"
     }
 }
