@@ -1,12 +1,15 @@
 {
     "name" : "pr0kbot",
-    "version" : "0.0.1",
+    "version" : "0.0.3",
     "description" : "IRC bot for #pr0k",
     "repository" : {
-        "type" : "git",
         "url" : "git://github.com/Ond/pr0kbot.git"
     },
     "author" : {
         "name" : "Ond"
+    },
+    "main": "pr0kbot.js",
+    "dependencies": {
+        "redis": "latest"
     }
 }
