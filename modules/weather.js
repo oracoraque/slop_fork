@@ -47,13 +47,14 @@ function Weather(query, fn) {
         if (!self.testProps(weather)) {
             return fn(new Error('Invalid req'));
         };
-        var res = [];
-        res.push(weather.CITY+': '+weather.CONDITION);
-        res.push(weather.TEMP_F+'F/'+weather.TEMP_C+'C');
-        res.push('(H:'+weather.HIGH+'F', 'L:'+weather.LOW+'F)');
-        res.push(weather.HUMIDITY);
-        res.push(weather.WIND_CONDITION);
-        return fn(null, res.join('; '));
+        var res = [
+            weather.CITY+': '+weather.CONDITION,
+            weather.TEMP_F+'F/'+weather.TEMP_C+'C',
+            '(H:'+weather.HIGH+'F', 'L:'+weather.LOW+'F)',
+            weather.HUMIDITY,
+            weather.WIND_CONDITION
+        ].join('; ');
+        return fn(null, res);
     });
 
     http.request(options, function(res) {
