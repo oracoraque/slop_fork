@@ -6,5 +6,5 @@
 module.exports = {
     error:function(err) {
         this.log('error', err);
-    };
+    }
 };
