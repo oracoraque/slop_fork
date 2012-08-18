@@ -7,6 +7,20 @@ An IRC bot for #pr0k, written in node, using Redis.
 + **Node** [Link](http://nodejs.org/download/)
 + **Redis** [Link](http://redis.io/download)
 
+## Running bot
+
+1. Clone this repository:
+```code
+git clone https://github.com/Ond/pr0kbot
+```
+2. Modify `config.json` to your desire. 
+3. Run server:
+```code
+node run
+```
+
+Pass an argument to `run` for separate configuration file.
+
 ## Configuration options
 
 Modify configuration in `config.json`
@@ -27,6 +41,8 @@ Modify configuration in `config.json`
 + `join` Joins channel
 
 ## Events
+
+You may listen for any of these events. Also support for arbitrary modes, defined +mode -mode e.g. `+v`
 
 + `connect`
 + `notice`
@@ -54,11 +70,9 @@ Modify configuration in `config.json`
 + `ban`
 + `unban`
 
-Also support for arbitrary modes, defined +mode -mode e.g. `+v`
-
 ## Modules
 
-There are two very simple module formats.
+pr0kbot automatically loads modules from the `/modules` directory. There are two very simple module formats. For an example, see the default `ping` module.
 
 ```js
 module.exports = {
