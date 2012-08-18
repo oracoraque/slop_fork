@@ -1,8 +1,8 @@
 
-var path = require('path');
+var path   = require('path');
 var events = require('events');
-var util = require('util');
-var net = require('net');
+var util   = require('util');
+var net    = require('net');
 
 var codes = {
     '001':      'connect',
@@ -53,7 +53,7 @@ function Bot(conf) { this.config = conf;
     con.on('error', this.emit.bind(this));
     con.on('close', this.emit.bind(this));
 
-    con.on('connect', this.auth.bind(this))
+    con.on('connect', this.onConnect.bind(this))
     con.on('data', this.parse.bind(this));
 };
 
@@ -83,12 +83,13 @@ Bot.prototype.log = function(type, msg) {
 };
 
 Bot.prototype.getModule = function(name, fn) {
-    var modules = this.modules
+    var modules = this.modules;
+    name = name.replace(/\.js$/, '');
+
     for (var i=0, len=modules.length;i<len;i++) {
         var module = modules[i]
         if (module.name === name 
-            || module.name.split('/').pop() === name) 
-            {
+            || module.name.split('/').pop() === name) {
                 if (fn) {
                     return fn(null, module.module);
                 }else {
@@ -96,7 +97,12 @@ Bot.prototype.getModule = function(name, fn) {
                 };
             };
     };
-    return new Error('No such module');
+
+    if (fn) {
+        return fn(new Error('No such module'));
+    }else {
+        return new Error('No such module');
+    };
 };
 
 Bot.prototype.use = function(name) {
@@ -130,21 +136,47 @@ Bot.prototype.pong = function(who) {
     this.write('PONG', ':'+who);
 };
 
-Bot.prototype.auth = function() {
-    var writeAuth = function() {
-        var config = this.config;
-        this.write('NICK', config.nick_name);
-        this.write('USER', config.user_name, '8 *', ':'+config.real_name);
-    }.bind(this);
-    setTimeout(writeAuth, 2000);
+Bot.prototype.auth = function(nick, user, real) {
+    var config = this.config;
+    config.nick_name = nick || config.nick_name;
+    config.user_name = user || config.user_name;
+    config.real_name = real || config.real_name;
+    this.write('NICK', config.nick_name);
+    this.write('USER', config.user_name, '8 *', ':'+config.real_name);
 };
 
-Bot.prototype.identify = function(pass) {
-    this.msg('NickServ', 'identify '+pass);
+Bot.prototype.onConnect = function() {
+    var auth = this.auth.bind(this);
+    setTimeout(auth, 2000);
 };
 
 Bot.prototype.msg = function(recip, what) {
     this.write('PRIVMSG', recip, ':'+what);
+};
+
+Bot.prototype.res = function(req, what) {
+    try {
+        var args = [];
+        var channel = req.channel;
+        var nick = ''
+        if (req.from && req.from.nick) {
+            nick = req.from.nick;
+        };
+        if (typeof channel !== 'undefined') {
+            args.push(channel);
+            what = nick+': '+what;
+        }else {
+            args.push(nick); 
+        };
+        args.push(what);
+        this.msg.apply(this, args);
+    }catch(exception) {
+        this.emit('error', exception);
+    }
+};
+
+Bot.prototype.identify = function(pass) {
+    this.msg('NickServ', 'identify '+pass);
 };
 
 Bot.prototype.notice = function(recip, what) {
@@ -181,99 +213,104 @@ Bot.prototype.parseSender = function(msg) {
             host:host
         }
     }catch(exception) {
+        console.log('Parse sender err', exception)
         this.emit('error', exception);
     };
 };
 
 Bot.prototype.parseLine = function(line) {
+    if (!line) { return };
+    this.log('in', line);
+
     try {
-        if (!line) { return };
-        this.log('in', line);
-
         var colons = line.split(':');
-
         if (/^PING/.test(colons[0])) {
-            this.emit('ping', colons[1]);
-        }else {
-            var origin = colons[1];
-            var dest = colons[2];
-            if (origin) {
-                var origins = origin.split(' ');
-                var sender = origins[0];
-                var code = origins[1];
-                var event = codes[code];
-                var recip = origins[2];
+            return this.emit('ping', colons[1]);
+        }
 
-                switch (event) {
-                    case 'connect':
-                        this.server = sender;
-                        this.ajoin();
-                        this.emit(event, sender);
-                        break;
-                    case 'nick in use':
-                    case 'notice':
-                    case 'msg':
-                    case 'invite':
-                    case 'join':
-                    case 'part':
-                        dest = colons.slice(2).join(':');
-                        sender = this.parseSender(sender);
+        var origin  = colons[1];
+        if (!origin || colons.length < 3) {
+            return; 
+        };
 
-                        var res = {
-                            from:sender,
-                            to:recip,
-                            val:dest
-                        };
+        var dest    = colons[2];
+        var origins = origin.split(' ');
+        var sender  = origins[0];
+        var code    = origins[1];
+        var event   = codes[code];
+        var args    = origins.slice(2, -1);
 
-                        if (/^(join|part)$/.test(event)) {
-                            res.channel = dest;
-                        };
+        switch (event) {
+            case 'connect':
+                this.server = sender;
+                this.ajoin();
+                this.emit(event, sender);
+            break;
+            case 'nick in use':
+            case 'notice':
+            case 'msg':
+            case 'invite':
+            case 'join':
+            case 'part':
+                dest = colons.slice(2).join(':');
+                sender = this.parseSender(sender);
+                var toChan = /^#/.test(args[0]);
 
-                        this.emit(event, res);
-
-                        if (/^#/.test(recip)) {
-                            res.channel = recip;
-                            this.emit('channel '+event, res);
-                        }else if (!res.from.nick) {
-                            this.emit('server '+event, res); 
-                        };
-
-                        if (parseInt(code)) {
-                            this.emit(code, res);
-                        };
-
-                        break;
-                    case 'mode':
-                        var mode = origins[3];
-                        var user = origins[4] || null;
-                        var val = modes[mode];
-
-                        var res = {
-                            channel:recip,
-                            user:user,
-                            mode:mode
-                        };
-
-                        if (val) {
-                            res.val = val;
-                            this.emit(val, res);
-                        };
-
-                        this.emit(mode, res);
-                        this.emit('mode', res);
-
-                        if (!user) {
-                            this.emit('channel mode', res);
-                        }else {
-                            this.emit('user mode', res); 
-                        };
-
-                        break;
-                    case 'undefined':
-                        this.emit('unhandled', line);
-                        break;
+                var req = {
+                    from:sender,
+                    args:args,
+                    val:dest
                 };
-            };
+
+                if (/^(join|part)$/.test(event)) {
+                    req.channel = dest;
+                }else if (toChan) {
+                    req.channel = args[0];
+                };
+
+                var res = this.res.bind(this, req);
+
+                this.emit(event, req, res);
+
+                if (toChan) {
+                    this.emit('channel '+event, req, res);
+                }else if (!req.from.nick) {
+                    this.emit('server '+event, req, res); 
+                };
+
+                if (parseInt(code)) {
+                    this.emit(code, req, res);
+                };
+            break;
+            case 'mode':
+                var mode = origins[3];
+                var user = origins[4] || null;
+                var val = modes[mode];
+
+                var req = {
+                    channel:args[0],
+                    user:user,
+                    mode:mode
+                };
+
+                if (val) {
+                    req.val = val;
+                    this.emit(val, req);
+                };
+
+                this.emit(mode, req);
+                this.emit('mode', req);
+
+                if (!user) {
+                    this.emit('channel mode', req);
+                }else {
+                    this.emit('user mode', req); 
+                };
+            break;
+            case 'undefined':
+            default:
+                this.emit('unhandled', line);
+            break;
         };
     }catch(exception){
         this.emit('error', exception);
