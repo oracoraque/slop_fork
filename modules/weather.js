@@ -1,34 +1,37 @@
 
+/**
+ * Retrieves whether data
+ * using hidden Google API
+ *
+ * XML parsing is ridiculous
+ */
+
 var http = require('http');
 var sax = require('sax');
 
 function Weather(query, fn) {
-    var options = {
-        host:'www.google.com',
-        path:'/ig/api?weather='+escape(query)
-    }
-
     var parser = sax.createStream();
     var weather = {};
     var tag = false;
     var self = this;
+    var options = {
+        host:'www.google.com',
+        path:'/ig/api?weather='+escape(query)
+    };
 
     parser.on('error', fn);
-
     parser.on('opentag', function(node) {
         try {
             var name = node.name;
             if (name === 'CITY') {
-                weather[name] = node.attributes.DATA;
+                return weather[name] = node.attributes.DATA;
             };
 
             if (self.parents[name]) {
                 tag = true;
-            }else {
-                if (tag) {
-                    if (self.figures[name]) {
-                        weather[name] = node.attributes.DATA;
-                    };
+            }else if (tag) {
+                if (self.figures[name]) {
+                    weather[name] = node.attributes.DATA;
                 };
             };
         }catch(exception) {
@@ -41,7 +44,6 @@ function Weather(query, fn) {
             tag = false;
         };
     });
-
 
     parser.on('end', function() {
         if (!self.testProps(weather)) {
