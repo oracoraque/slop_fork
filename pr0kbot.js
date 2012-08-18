@@ -187,6 +187,10 @@ Bot.prototype.join = function(channel) {
     this.write('JOIN', channel);
 };
 
+Bot.prototype.part = function(channel) {
+    this.write('PART', channel);
+};
+
 Bot.prototype.ajoin = function() {
     var autojoin = this.config.autojoin;
     var join = this.join.bind(this);
@@ -213,7 +217,6 @@ Bot.prototype.parseSender = function(msg) {
             host:host
         }
     }catch(exception) {
-        console.log('Parse sender err', exception)
         this.emit('error', exception);
     };
 };
