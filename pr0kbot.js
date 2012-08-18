@@ -8,11 +8,29 @@ var codes = {
     '001':      'connect',
     'NOTICE':   'notice',
     'PRIVMSG':  'msg',
-    'INVITE':   'invite'
+    'INVITE':   'invite',
+    'MODE':     'mode',
+    'JOIN':     'join',
+    'PART':     'part',
+    'QUIT':     'quit'
 };
 
-function Bot(conf) {
-    this.config = conf;
+var modes = {
+    '+v': 'voice',
+    '-v': 'devoice',
+    '+h': 'halfop',
+    '-h': 'dehalfop',
+    '+o': 'op',
+    '-o': 'deop',
+    '+b': 'ban',
+    '-b': 'unban',
+    '+m': 'mute',
+    '-m': 'unmute',
+    '+i': 'inviteonly',
+    '-i': 'deinviteonly'
+};
+
+function Bot(conf) { this.config = conf;
     var self = this;
 
     var con = net.createConnection(conf.port, conf.network);
@@ -182,7 +200,7 @@ Bot.prototype.parseLine = function(line) {
                 var recip = origins[2];
 
                 switch (event) {
-                    case 'connected':
+                    case 'connect':
                         this.server = sender;
                         this.ajoin();
                         this.emit(event, sender);
@@ -190,6 +208,8 @@ Bot.prototype.parseLine = function(line) {
                     case 'notice':
                     case 'msg':
                     case 'invite':
+                    case 'join':
+                    case 'part':
                         dest = colons.slice(2).join(':');
                         sender = this.parseSender(sender);
 
@@ -199,12 +219,42 @@ Bot.prototype.parseLine = function(line) {
                             val:dest
                         };
 
+                        if (/^(join|part)$/.test(event)) {
+                            res.channel = dest;
+                        };
+
                         this.emit(event, res);
 
                         if (/^#/.test(recip)) {
                             this.emit('channel '+event, res);
                         }else if (!res.from.nick) {
                             this.emit('server '+event, res); 
+                        };
+
+                        break;
+                    case 'mode':
+                        var mode = origins[3];
+                        var user = origins[4] || null;
+                        var val = modes[mode];
+
+                        var res = {
+                            channel:recip,
+                            user:user,
+                            mode:mode
+                        };
+
+                        if (val) {
+                            res.val = val;
+                            this.emit(val, res);
+                        };
+
+                        this.emit(mode, res);
+                        this.emit('mode', res);
+
+                        if (!user) {
+                            this.emit('channel mode', res);
+                        }else {
+                            this.emit('user mode', res); 
                         };
 
                         break;
