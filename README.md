@@ -49,6 +49,9 @@ Modify configuration in `config.json`
 + `msg` Sends PRIVMSG to channel or user
 + `notice` Sends NOTICE to channel or user
 + `join` Joins channel
++ `part` Parts channel
++ `auth` Sends NICK / USER to server
++ `identify` Identifies with NickServ
 
 ## Events
 
@@ -86,10 +89,10 @@ pr0kbot automatically loads modules from the `/modules` directory. There are two
 
 ```js
 module.exports = {
-    event1:function() {
+    event1:function(req, res) {
         /* handle event */
     },
-    event2:function() {
+    event2:function(req, res) {
         /* handle event */
     }
 };
@@ -98,14 +101,16 @@ module.exports = {
 And the more liberal:
 
 ```js
-module.exports = function(con) {
-    this.on('event1', function() {
+module.exports = function(bot) {
+    bot.on('event1', function(req, res) {
         /* handle event */
     })
-
-    this.on('event2', function() {
+    bot.on('event2', function(req, res) {
         /* handle event */
     })
 }
 ```
 
+## Module example
+
+Simply place your module in the `/modules` directory, or call the `bot.use(modulename)` function manually, somewhere in your code.
