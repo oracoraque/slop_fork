@@ -21,17 +21,39 @@ Modify configuration in `config.json`
 
 ## Commands
 
-+ `write`
-+ `msg`
-+ `notice`
-+ `join`
++ `write` Writes raw commands to the server
++ `msg` Sends PRIVMSG to channel or user
++ `notice` Sends NOTICE to channel or user
++ `join` Joins channel
 
 ## Events
 
 + `connect`
-+ `server notice`
 + `notice`
++ `server notice`
++ `channel notice`
+
 + `msg`
++ `server msg`
++ `channel msg`
+
++ `mode`
++ `channel mode`
++ `user mode`
+
++ `mute`
++ `unmute`
++ `inviteonly`
++ `deinviteonly`
+
++ `voice`
++ `devoice`
++ `halfop`
++ `dehalfop`
++ `op`
++ `deop`
++ `ban`
++ `unban`
 
 ## Modules
 
