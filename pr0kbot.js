@@ -6,7 +6,8 @@ var net    = require('net');
 
 var codes = {
     '001':      'connect',
-    '433':      'nick in use',
+    '433':      'nickinuse',
+    '353':      'names',
     'NOTICE':   'notice',
     'PRIVMSG':  'msg',
     'INVITE':   'invite',
@@ -33,9 +34,7 @@ var modes = {
 
 function Bot(conf) { 
     var self = this;
-
     this.config = conf;
-    this.prefix = conf.command_prefix;
 
     var con = net.createConnection(conf.port, conf.network);
     con.setEncoding('utf8');
@@ -171,6 +170,7 @@ Bot.prototype.msg = function(recip, what) {
 };
 
 Bot.prototype.res = function(req, what) {
+    this.log('error', JSON.stringify(req))
     try {
         var args = [];
         var channel = req.channel;
@@ -230,7 +230,8 @@ Bot.prototype.parseSender = function(msg) {
         return {
             nick:nick,
             user:user,
-            host:host
+            host:host,
+            status:status
         }
     }catch(exception) {
         this.emit('error', exception);
@@ -265,20 +266,22 @@ Bot.prototype.parseLine = function(line) {
                 this.ajoin();
                 this.emit(event, sender);
             break;
-            case 'nick in use':
             case 'notice':
             case 'msg':
             case 'invite':
             case 'join':
             case 'part':
+            case 'names':
+            case 'nickinuse':
                 dest = colons.slice(2).join(':');
                 sender = this.parseSender(sender);
 
                 var toChan = /^#/.test(args[0]);
                 var req = {
                     from:sender,
-                    args:args,
-                    val:dest
+                    params:args,
+                    val:dest,
+                    raw:line
                 };
 
                 if (/^(join|part)$/.test(event)) {
@@ -291,7 +294,7 @@ Bot.prototype.parseLine = function(line) {
 
                 this.emit(event, req, res);
 
-                var prefix = this.prefix;
+                var prefix = this.config.command_prefix;
                 if (dest.startsWith(prefix)) {
                     var inds = dest.indexOf(' ');
                     var sub = dest;
@@ -300,8 +303,7 @@ Bot.prototype.parseLine = function(line) {
                         sub = dest.substring(0, inds);
                         argv = dest.substring(inds+1).split(' ');
                     };
-                    req.command = sub;
-                    req.argv = argv;
+                    req.cmd = {name:sub, argv:argv}
                     this.emit(sub, req, res);
                 };
 
@@ -323,7 +325,8 @@ Bot.prototype.parseLine = function(line) {
                 var req = {
                     channel:args[0],
                     user:user,
-                    mode:mode
+                    mode:mode,
+                    raw:line
                 };
 
                 if (val) {
