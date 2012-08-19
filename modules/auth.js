@@ -12,11 +12,10 @@ module.exports = function(bot) {
 
     bot.on('433', function(req) {
        var rand = Math.random().toString(36).substring(2, 6); 
-       config.nick_name = [nick, rand].join('-');
-       bot.auth();
+       bot.auth([nick, rand].join('-'));
     });
 
-    bot.on('notice', function(req) {
+    bot.on('notice', function(req, res) {
         if (req.from.nick === 'NickServ') {
             if (req.val.startsWith('please choose a different nick')) {
                 bot.identify(config.password);
