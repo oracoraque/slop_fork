@@ -88,6 +88,28 @@ You may listen for any of these events. Also support for arbitrary modes, define
 + `ban`
 + `unban`
 
+
+## Event handlers
+
+This is a standard event listener which captures the `join` event. This handler is called when a user joins a channel.
+
+```js
+bot.on('join', function(ev, res) {
+
+});
+```
+
+The `ev` object contains information about the event. Not all events contain the same information. All events contain the following data properties:
+
++ `from` An object containing `nick`, `host`, and `user` of the person who joined
++ `params` An array containing event parameters, in this case it is empty
++ `val` The raw suffix string (or in IRC terms, the portion of the message occuring after the last colon separator. In this case, it is empty.
+
+The `join` and `part` events receive a unique `channel` property. Command listeners, e.g. `.google` or `.weather` will receive a `cmd` property which has the following attributes:
+
++ `name` The name of the command
++ `argv` An array of arguments to the command
+
 ## Modules
 
 pr0kbot automatically loads modules from the `/modules` directory. There are two very simple module formats. For an example, see the default `ping` module.
