@@ -88,7 +88,7 @@ You may listen for any of these events:
 + `ban`
 + `unban`
 
-You may also listen for arbitrary modes with +mode / -mode, e.g. `+v`. The `msg` event consumes both channel and server messages. The `channel msg` event consumes only channel messages, and so forth. This rule apples to `msg`, `notice`, and `mode`. You may also listen for messages beginning with a command prefix. The default command prefix is `.`.
+You may also listen for arbitrary modes with +mode / -mode, e.g. `+v`. The `msg` event consumes both channel and server messages. The `channel msg` event consumes only channel messages, and so forth. This rule apples to `msg`, `notice`, and `mode`. You may also listen for messages beginning with a command prefix. The default command prefix is `.` and it can be configured in `config.json`.
 
 ## Event handlers
 
@@ -104,7 +104,7 @@ The `ev` object contains information about the event. Not all events contain the
 
 + `from` An object containing `nick`, `host`, and `user` of the person who joined
 + `params` An array containing event parameters, in this case it is empty
-+ `val` The raw suffix string (or in IRC terms, the portion of the message occuring after the last colon separator. In this case, it is empty.
++ `val` The raw suffix string ,or in IRC terms the portion of the message occuring after the last colon separator. In this case, it is empty.
 
 The `join` and `part` events receive a unique `channel` property. Command listeners, e.g. `.google` or `.weather` will receive a `cmd` property which has the following attributes:
 
