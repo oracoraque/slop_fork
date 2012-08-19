@@ -111,6 +111,12 @@ The `join` and `part` events receive a unique `channel` property. Command listen
 + `name` The name of the command
 + `argv` An array of arguments to the command
 
+`res` is a shortcut response function. Instead of parsing sender / channel manually, it will determine automatically how to respond (to a user, channel, etc.). Simply call it with a response message, e.g.
+
+```js
+res('Cool')
+```
+
 ## Modules
 
 pr0kbot automatically loads modules from the `/modules` directory. There are two very simple module formats. For an example, see the default `ping` module.
