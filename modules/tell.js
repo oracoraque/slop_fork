@@ -2,7 +2,7 @@
  * Send memos to users
  *
  * Command signature:
- * .tell <args>
+ * .tell <who> <what>
  */
 
 var tells = [];
