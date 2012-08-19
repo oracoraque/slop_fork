@@ -100,7 +100,8 @@ Weather.prototype.format = function(o) {
 
 module.exports = function(bot) {
     bot.on('.we', function(req, res) {
-        var query = req.val.substring(4);
+        if (req.argv.length < 1) { return }
+        var query = req.argv[0];
         var weather = new Weather(query, function(err, data) {
             if (!err && data) {
                 res(data);
