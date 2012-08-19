@@ -104,9 +104,9 @@ The `ev` object contains information about the event. Not all events contain the
 
 + `from` An object containing `nick`, `host`, and `user` of the person who joined
 + `params` An array containing event parameters, in this case it is empty
-+ `val` The raw suffix string ,or in IRC terms the portion of the message occuring after the last colon separator. In this case, it is empty.
++ `val` The raw suffix string ,or in IRC terms the portion of the message occuring after the last colon separator.
 
-The `join` and `part` events receive a unique `channel` property. Command listeners, e.g. `.google` or `.weather` will receive a `cmd` property which has the following attributes:
+Command listeners, e.g. `.google` or `.weather` will receive a `cmd` property which has the following attributes:
 
 + `name` The name of the command
 + `argv` An array of arguments to the command
