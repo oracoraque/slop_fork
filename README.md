@@ -123,7 +123,7 @@ Simply place your module in the `/modules` directory, or call the `bot.load(path
 ```js
 module.exports = function(bot) {
     bot.on('.unload', function(req, res) {
-        var module = req.val.substring(8);        
+        var module = req.argv[0];
         if (!module) { return }
         bot.unload(module, function(err) {
             if (err) {
