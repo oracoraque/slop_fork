@@ -105,6 +105,7 @@ The `ev` object contains information about the event. Not all events contain the
 + `from` An object containing `nick`, `host`, and `user` of the person who joined
 + `params` An array containing event parameters, in this case it is empty
 + `val` The raw suffix string ,or in IRC terms the portion of the message occuring after the last colon separator.
++ `raw` The complete, unparsed line received from IRC server
 
 Command listeners, e.g. `.google` or `.weather` will receive a `cmd` property which has the following attributes:
 
