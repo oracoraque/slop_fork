@@ -60,7 +60,7 @@ These commands exist for the bot:
 
 ## Events
 
-You may listen for any of these events. Also support for arbitrary modes, defined +mode -mode e.g. `+v`. The `msg` event consumes both channel and user messages. The `channel msg` event consumes only channel messages,  `user msg` applies to only user messages, and so forth. This rule apples to `msg`, `notice`, and `mode`. You may also listen for commands by name, e.g. `.we` or `.g`. Configure the command prefix in `config.json`.
+You may listen for any of these events:
 
 + `connect`
 + `notice`
@@ -88,6 +88,7 @@ You may listen for any of these events. Also support for arbitrary modes, define
 + `ban`
 + `unban`
 
+You may also listen for arbitrary modes with +mode / -mode, e.g. `+v`. The `msg` event consumes both channel and server messages. The `channel msg` event consumes only channel messages, and so forth. This rule apples to `msg`, `notice`, and `mode`. You may also listen for messages beginning with a command prefix. The default command prefix is `.`.
 
 ## Event handlers
 
