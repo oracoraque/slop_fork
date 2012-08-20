@@ -23,7 +23,10 @@ function Weather(query, fn) {
         if (!parent && figure) {
             parent = figure;
         }else if (name === 'CITY' || (parent && parent[name])) {
-            weather[name] = node.attributes.DATA;
+            var data = node.attributes.DATA;
+            if (data) {
+                weather[name] = data;
+            }
         };
     });
 
@@ -46,18 +49,10 @@ function Weather(query, fn) {
         path:'/ig/api?weather='+escape(query)
     };
 
-    console.log('Requesting', options)
-
     http.request(options, function(res) {
         res.pipe(parser);
     }).end();
 };
-
-/**
- * Attach desired tags
- * and their parents
- * to the prototype
- */
 
 Weather.prototype.figures = {
     'CURRENT_CONDITIONS':   {
