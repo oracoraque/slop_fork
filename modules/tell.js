@@ -8,7 +8,6 @@
 var tells = [];
 
 module.exports = function(hook) {
-    var bot = this;
     hook('join', function(ev, res) {
         var joiner = ev.from.nick.toLowerCase();
         var msgs = [];
@@ -29,7 +28,7 @@ module.exports = function(hook) {
             var dif = parseInt((Date.now() - msg.when) / 6e4);
             if (dif < 1) { dif = '< 1' };
             msg = [
-                msg.from, 'says:',
+                '<'+msg.from+'>',
                 '"'+msg.what+'"',
                 dif, 'minutes ago'
             ].join(' ');
