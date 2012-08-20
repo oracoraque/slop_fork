@@ -68,19 +68,14 @@ Weather.prototype.figures = {
     }
 };
 
-Weather.prototype.flattenedFigures = (function() {
-    var figures = Weather.prototype.figures;
-    var flat = [];
-    for (key in figures) {
-        flat.concat(Object.keys(figures[key]));
-    };
-    return flat;
-})();
-
 Weather.prototype.testProps = function(o) {
-    var keys = this.flattenedFigures;
-    return keys.every(function(i) {
-        return o.hasOwnProperty(i);
+    var figures = this.figures;
+    var flat = ['CITY'];
+    for (key in figures) {
+        flat = flat.concat(Object.keys(figures[key]));
+    };
+    return flat.every(function(key) {
+        return !!o[key];
     });
 };
 
@@ -91,7 +86,7 @@ Weather.prototype.format = function(o) {
         '(H:'+o.HIGH+'F', 'L:'+o.LOW+'F)',
         o.HUMIDITY,
         o.WIND_CONDITION
-    ].join('; ');
+    ].join('@ ');
     return res;
 };
 
