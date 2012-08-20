@@ -69,8 +69,7 @@ module.exports = function(bot, hook) {
             if (err) {
                 res('Try again soon');
             }else {
-                var colors = bot.IRC_COLORS;
-                res(colors.green+data+colors.clear);
+                res(data);
             };
         });
     });
