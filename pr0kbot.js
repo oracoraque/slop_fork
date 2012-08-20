@@ -4,7 +4,13 @@ var events = require('events');
 var util   = require('util');
 var net    = require('net');
 
-var codes = {
+function Bot(conf) { 
+    this.config = conf;
+};
+
+util.inherits(Bot, events.EventEmitter);
+
+Bot.prototype.CODES = {
     '001':      'connect',
     '433':      'nickinuse',
     '353':      'names',
@@ -17,7 +23,7 @@ var codes = {
     'QUIT':     'quit'
 };
 
-var modes = {
+Bot.prototype.MODES = {
     '+v': 'voice',
     '-v': 'devoice',
     '+h': 'halfop',
@@ -32,39 +38,6 @@ var modes = {
     '-i': 'deinviteonly'
 };
 
-function Bot(conf) { 
-    var self = this;
-    this.config = conf;
-
-    var con = net.createConnection(conf.port, conf.network);
-    con.setEncoding('utf8');
-
-    /**
-     * Process write queue
-     * on 200ms interval
-     */
-    var writeInterval = this.writeInterval = function() {
-        if (!this.writeQueue.length) { return; };
-        var item = this.writeQueue.shift();
-        item.call(this, this.con);
-    }.bind(this);
-
-    setInterval(writeInterval, 200);
-
-    /**
-     * Proxy `error` and `close` events
-     */
-    con.on('error', this.emit.bind(this));
-    con.on('close', this.emit.bind(this));
-
-    con.on('connect', this.onConnect.bind(this))
-    con.on('data', this.parse.bind(this));
-};
-
-util.inherits(Bot, events.EventEmitter);
-
-Bot.prototype.CODES = codes;
-Bot.prototype.MODES = modes;
 Bot.prototype.COLORS = {
     clear:        '\u001b[0m',
     green:        '\u001b[1;32m',
@@ -83,14 +56,42 @@ Bot.prototype.COLORS = {
     gray:         '\u001b[0;37m',
 };
 
+Bot.prototype.writeQueue = [];
+Bot.prototype.modules = [];
+
+Bot.prototype.connect = function() {
+    var conf = this.config;
+    var con = this.con = 
+    net.createConnection(conf.port, conf.network);
+    con.setEncoding('utf8');
+
+    /**
+     * Process write queue
+     * on 200ms interval
+     */
+    this.writeInterval = function() {
+        if (!this.writeQueue.length) { return; };
+        var item = this.writeQueue.shift();
+        item.call(this, this.con);
+    }.bind(this);
+
+    setInterval(this.writeInterval, 200);
+
+    /**
+     * Proxy `error` and `close` events
+     */
+    con.on('error', this.emit.bind(this));
+    con.on('close', this.emit.bind(this));
+
+    con.on('connect', this.onConnect.bind(this))
+    con.on('data', this.parse.bind(this));
+};
+
 Bot.prototype.color = function(color, text) {
     var colors = this.COLORS;
     color = colors[color.toLowerCase()] || '';
     return [color, colors.clear].join(text);
 };
-
-Bot.prototype.writeQueue = [];
-Bot.prototype.modules = [];
 
 Bot.prototype.log = function(type, msg) {
     var log = this.config.log;
