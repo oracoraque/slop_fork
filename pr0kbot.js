@@ -263,14 +263,16 @@ Bot.prototype.parseSender = function(msg) {
         var nick = msg[0];
         var host = msg[1];
         var at = host.indexOf('@');
-        var user = host.substring(0, at).replace(/^~/, '');
+        var user = host
+        .substring(0, at)
+        .replace(/^~/, '');
+
         host = host.substring(at+1);
 
         return {
             nick:nick,
             user:user,
-            host:host,
-            status:status
+            host:host
         }
     }catch(exception) {
         this.emit('error', exception);
