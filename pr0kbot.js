@@ -3,10 +3,10 @@ var path   = require('path');
 var events = require('events');
 var util   = require('util');
 var net    = require('net');
+var fs     = require('fs')
 
 function Bot(conf) { 
     this.config = conf;
-    this.writeQueue = [];
     this.modules = [];
 
     require('./utils/codes').call(this);
@@ -25,9 +25,10 @@ Bot.prototype.connect = function() {
      * Process write queue
      * on 200ms interval
      */
+    var writeQueue = this.writeQueue = [];
     this.writeInterval = function() {
-        if (!this.writeQueue.length) { return; };
-        var item = this.writeQueue.shift();
+        if (!writeQueue.length) { return; };
+        var item = writeQueue.shift();
         item.call(this, this.con);
     }.bind(this);
 
@@ -70,12 +71,14 @@ Bot.prototype.log = function(type, msg) {
 
 Bot.prototype.getModule = function(name, fn) {
     var modules = this.modules;
-    name = name.replace(/\.js$/, '');
+    name = path.resolve(name).replace(/\.js$/, '');
+
+    var cb = typeof fn === 'function'
+    ? fn : function(){}
 
     for (var i=0, len=modules.length;i<len;i++) {
         var module = modules[i]
-        var isName = module.name === name;
-        if (isName || module.name.split('/').pop() === name) {
+        if (module.name === name) {
             if (fn) {
                 return fn(null, module, i);
             }else {
@@ -84,36 +87,54 @@ Bot.prototype.getModule = function(name, fn) {
         };
     };
 
-    if (fn) {
-        return fn(new Error('No such module'));
-    }else {
-        return null;
-    };
+    return cb(new Error('No such module'));
 };
 
 Bot.prototype.use = 
-Bot.prototype.load = function(name) {
-    name = path.resolve(name).replace(/\.js$/, '');
-    var module = require(name);
-    this.log('load', name);
+Bot.prototype.load = function(name, fn) {
+    if (!/\.js$/.test(name)) {
+        name = name + '.js';
+    };
 
+    name = path.resolve(name);
+    var cb = typeof fn === 'function' 
+    ? fn : function(){};
+    
+    var preExist = this.getModule(name);
+    if (preExist) {
+        return cb(new Error('Module already loaded'));
+    };
+
+    try {
+        var stat = fs.statSync(name);
+        if (!stat || !stat.isFile()) {
+            return cb(new Error('No such module'));
+        };
+    }catch(exception) {
+        return cb(new Error('No such module'));
+    }
+
+    var module = require(name);
+    name = name.replace(/\.js$/, '');
+
+    this.log('load', name);
     this.modules.push({
         name:name,
         module:module
     });
 
     if (typeof module === 'function') {
-        return module.call(this, this);
+        module.call(this, this);
     }else {
         for (key in module) {
             this.on(key, module[key].bind(this));
         };
     };
+
+    return cb(null, 'ok');
 };
 
 Bot.prototype.unload = function(name, fn) {
-    var module = this.getModule(name);
-    if (!module) { return };
     var modules = this.modules;
     var self = this;
 
@@ -123,7 +144,7 @@ Bot.prototype.unload = function(name, fn) {
             modules.splice(index, 1); 
             if (fn) { fn(null, 'ok'); };
         }else if (fn) {
-            fn(new Error('Module not exist'));
+            fn(new Error('Module not loaded'));
         };
     });
 };
