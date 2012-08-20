@@ -86,7 +86,7 @@ Weather.prototype.format = function(o) {
         '(H:'+o.HIGH+'F', 'L:'+o.LOW+'F)',
         o.HUMIDITY,
         o.WIND_CONDITION
-    ].join('@ ');
+    ].join('; ');
     return res;
 };
 
