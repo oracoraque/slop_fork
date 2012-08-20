@@ -43,11 +43,13 @@ function Bot(conf) {
      * Process write queue
      * on 200ms interval
      */
-    var writeInterval = setInterval(function() {
-        if (!self.writeQueue.length) { return; };
-        var item = self.writeQueue.shift();
-        item.call(self, con);
-    }, 200);
+    var writeInterval = this.writeInterval = function() {
+        if (!this.writeQueue.length) { return; };
+        var item = this.writeQueue.shift();
+        item.call(this, this.con);
+    }.bind(this);
+
+    setInterval(writeInterval, 200);
 
     /**
      * Proxy `error` and `close` events
@@ -60,6 +62,32 @@ function Bot(conf) {
 };
 
 util.inherits(Bot, events.EventEmitter);
+
+Bot.prototype.CODES = codes;
+Bot.prototype.MODES = modes;
+Bot.prototype.COLORS = {
+    clear:        '\u001b[0m',
+    green:        '\u001b[1;32m',
+    cyan:         '\u001b[1;36m',
+    red:          '\u001b[1;31m',
+    blue:         '\u001b[1;34m',
+    magenta:      '\u001b[1;35m',
+    yellow:       '\u001b[1;33m',
+    white:        '\u001b[1;37m',
+    darkgreen:    '\u001b[0;32m',
+    darkcyan:     '\u001b[0;36m',
+    darkred:      '\u001b[0;31m',
+    darkblue:     '\u001b[0;34m',
+    darkmagenta:  '\u001b[0;35m',
+    darkyellow:   '\u001b[0;33m',
+    gray:         '\u001b[0;37m',
+};
+
+Bot.prototype.color = function(color, text) {
+    var colors = this.COLORS;
+    color = colors[color.toLowerCase()] || '';
+    return [color, colors.clear].join(text);
+};
 
 Bot.prototype.writeQueue = [];
 Bot.prototype.modules = [];
@@ -74,11 +102,15 @@ Bot.prototype.log = function(type, msg) {
     var args = [];
 
     if (type === 'in') {
-        args.unshift('\u001b[1;32m', '[ <- ]', '\u001b[0m', msg);
+        args.unshift(this.color('green', '[<-]'), msg);
     }else if (type === 'out') {
-        args.unshift('\u001b[1;36m', '[ -> ]', '\u001b[0m', msg);
+        args.unshift(this.color('cyan', '[->]'), msg);
+    }else if (type === 'load') {
+        args.unshift(this.color('blue', '[load]'), msg);
+    }else if (type === 'unload') {
+        args.unshift(this.color('magenta', '[unload]'), msg);
     }else if (type === 'error') {
-        args.unshift('\u001b[1;31m', msg, '\u001b[0m\n');
+        args.unshift(this.color('red', msg));
     };
 
     console.error.apply(this, args);
@@ -93,7 +125,7 @@ Bot.prototype.getModule = function(name, fn) {
         if (module.name === name 
             || module.name.split('/').pop() === name) {
                 if (fn) {
-                    return fn(null, module.module, i);
+                    return fn(null, module, i);
                 }else {
                     return module.module;
                 };
@@ -103,17 +135,18 @@ Bot.prototype.getModule = function(name, fn) {
     if (fn) {
         return fn(new Error('No such module'));
     }else {
-        return new Error('No such module');
+        return null;
     };
 };
 
 Bot.prototype.use = 
 Bot.prototype.load = function(name) {
-    name = path.resolve(name);
+    name = path.resolve(name).replace(/\.js$/, '');
     var module = require(name);
+    this.log('load', name);
 
     this.modules.push({
-        name:name.replace(/\.js$/, ''),
+        name:name,
         module:module
     });
 
@@ -127,9 +160,14 @@ Bot.prototype.load = function(name) {
 };
 
 Bot.prototype.unload = function(name, fn) {
+    var module = this.getModule(name);
+    if (!module) { return };
     var modules = this.modules;
+    var self = this;
+
     this.getModule(name, function(err, module, index) {
         if (!err && module) {
+            self.log('unload', module.name);
             modules.splice(index, 1); 
             if (fn) { fn(null, 'ok'); };
         }else if (fn) {
