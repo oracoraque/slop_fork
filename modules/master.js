@@ -4,9 +4,9 @@
 
 module.exports = function(hook) {
     var bot = this;
-    var master = this.config.master;
+    var master = this.config.master.toLowerCase();
     var isMaster = function(m) {
-        return master === m;
+        return master === m.toLowerCase();
     };
 
     hook('invite', function(ev) {
@@ -27,7 +27,7 @@ module.exports = function(hook) {
             if (err) {
                 res(err.toString());
             }else {
-                res('Successfully loaded module "'+name+'"'); 
+                res('Loaded module "'+name+'"'); 
             };
         });
     });
@@ -44,7 +44,7 @@ module.exports = function(hook) {
             if (err) {
                 res(err.toString());
             }else {
-                res('Successfully unloaded module "'+name+'"'); 
+                res('Unloaded module "'+name+'"'); 
             };
         });
     });
