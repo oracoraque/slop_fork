@@ -10,7 +10,7 @@ module.exports = function() {
         cyan:        '1;36',
         red:         '1;31',
         blue:        '1;34',
-        agenta:      '1;35m',
+        magenta:      '1;35m',
         yellow:      '1;33',
         white:       '1;37',
         darkgreen:   '0;32',
@@ -25,14 +25,16 @@ module.exports = function() {
     this.termColor = function(color, text) {
         var colors = this.TERM_COLORS;
         var prefix = '\u001b[';
-            var suffix = 'm';
-            var clear = [prefix, suffix].join(colors.clear);
-            color = [prefix, suffix].join(colors[color.toLowerCase()] || 0);
-            if (text) {
-                return [color, clear].join(text);
-            }else {
-                return color; 
-            };
+        var suffix = 'm';
+        var clear = [prefix, suffix].join(colors.clear);
+        color = color.toLowerCase();
+        color = [prefix, suffix].join(colors[color] || 0);
+
+        if (text) {
+            return [color, clear].join(text);
+        }else {
+            return color; 
+        };
     };
 
     this.IRC_COLORS = {
