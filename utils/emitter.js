@@ -6,18 +6,15 @@ function Emitter() {
     this.listeners = [];
 }
 
-Emitter.prototype.on = function(ev, fn, vol) {
+Emitter.prototype.on = function(module, ev, fn) {
     var ob = {
         ev:ev,
         fn:fn,
-        vol:vol||false
+        module:module
     };
 
-    return this.listeners.push(ob) - 1;
-}
-
-Emitter.prototype.once = function(ev, fn) {
-    this.on(ev, fn, true);
+    var index = this.listeners.push(ob) -1;
+    return index;
 }
 
 Emitter.prototype.emit = function(ev) {
@@ -40,7 +37,6 @@ Emitter.prototype.emit = function(ev) {
     }
 };
 
-Emitter.prototype.findListeners = 
 Emitter.prototype.listeners = function(ev) {
     var res = [];
     var listeners = this.listeners;
@@ -63,8 +59,17 @@ Emitter.prototype.removeListeners = function(ev) {
     };
 };
 
-Emitter.prototype.removeListener = 
-Emitter.prototype.unhook = function(ev, fn) {
+Emitter.prototype.removeModule = function(module) {
+    var listeners = this.listeners;
+    for (var i=0, len=listeners.length;i<len;i++) {
+        var listener = listeners[i];
+        if (!listener || listener.module === ev) {
+            listeners.splice(i, 1);
+        };
+    };
+};
+
+Emitter.prototype.removeListener = function(ev, fn) {
     var listeners = this.listeners;
     for (var i=0, len=listeners.length;i<len;i++) {
         var listener = listeners[i];
