@@ -1,5 +1,15 @@
 /**
  * Master's privileged commands
+ *
+ * .load <module path>
+ * .unload <module path>
+ *
+ * Note that the path is relative
+ * to the CWD. If the module
+ * you want to unload is in
+ * `modules` diretory, then
+ * unload it with 
+ * `.unload modules/<name>`
  */
 
 module.exports = function(hook) {
