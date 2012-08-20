@@ -65,6 +65,8 @@ Bot.prototype.log = function(type, msg) {
         args.unshift(this.termColor('magenta', '[unload]'), msg);
     }else if (type === 'error') {
         args.unshift(this.termColor('red', msg));
+    }else {
+        args.unshift(msg || type); 
     };
 
     console.error.apply(this, args);
@@ -148,6 +150,9 @@ Bot.prototype.unload = function(name, fn) {
     var modules = this.modules;
     var self = this;
 
+    /**
+     * Unhook event listeners
+     */
     var unloadModule = function(module) {
         module.hooks.forEach(function(hook) {
             self.unhook(hook.ev, hook.fn);
