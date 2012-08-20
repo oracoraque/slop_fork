@@ -5,8 +5,8 @@ An IRC bot for #pr0k, written in node. Features:
 + Simple module system
 + Loading / unloading modules dynamically in operation
 + Extensive events, reasonable parsing
-+ Color formatting for IRC output
-+ Master privileges, autojoin, most of the configuration and modules you expect out of the box
++ Master privileges, autojoin, most options and modules you expect out of the box
++ Extensive formatting for IRC output; bold, underline, foreground & background colors
 
 ## Installation requirements
 
@@ -66,6 +66,7 @@ These commands exist for the bot:
 + `unload` Unload a module with provided name
 + `termColor` Returns a term color or colorifies the second argument
 + `color` Colors text for IRC output. Arguments are: text, foreground, background
++ `format` First argument is options object. Accepts `style` `foreground` and `background`. Second argument is string
 
 ## Events
 
@@ -216,3 +217,27 @@ module.exports = function(hook) {
 ```
 
 You can also customize the command prefix in `config.json`.
+
+## IRC output formatting
+
+Using the `format` function you may output pretty much any style you'd want, and many styles you shouldn't want.
+
+### Module example
+
+Consider a module which echos command arguments, with added obnoxiousness:
+
+```js
+module.exports = function(hook) {
+    var colorify = function(ev, res) {
+        var args = ev.cmd.argv.join(' ');
+        var options = {
+            style:'bold',
+            foreground:'white',
+            background:'blue'
+        };
+        res(this.format(options, args));
+    }.bind(this);
+
+    hook('.colorify', colorify);
+};
+```
