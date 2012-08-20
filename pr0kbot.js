@@ -3,8 +3,10 @@ var path   = require('path');
 var events = require('events');
 var util   = require('util');
 var net    = require('net');
+var colors = require('./colors');
 
 function Bot(conf) { 
+    colors.call(this);
     this.config = conf;
 };
 
@@ -38,24 +40,6 @@ Bot.prototype.MODES = {
     '-i': 'deinviteonly'
 };
 
-Bot.prototype.TERM_COLORS = {
-    clear:        '\u001b[0m',
-    green:        '\u001b[1;32m',
-    cyan:         '\u001b[1;36m',
-    red:          '\u001b[1;31m',
-    blue:         '\u001b[1;34m',
-    magenta:      '\u001b[1;35m',
-    yellow:       '\u001b[1;33m',
-    white:        '\u001b[1;37m',
-    darkgreen:    '\u001b[0;32m',
-    darkcyan:     '\u001b[0;36m',
-    darkred:      '\u001b[0;31m',
-    darkblue:     '\u001b[0;34m',
-    darkmagenta:  '\u001b[0;35m',
-    darkyellow:   '\u001b[0;33m',
-    gray:         '\u001b[0;37m',
-};
-
 Bot.prototype.writeQueue = [];
 Bot.prototype.modules = [];
 
@@ -87,11 +71,6 @@ Bot.prototype.connect = function() {
     con.on('data', this.parse.bind(this));
 };
 
-Bot.prototype.color = function(color, text) {
-    var colors = this.TERM_COLORS;
-    color = colors[color.toLowerCase()] || '';
-    return [color, colors.clear].join(text);
-};
 
 Bot.prototype.log = function(type, msg) {
     var log = this.config.log;
@@ -103,15 +82,15 @@ Bot.prototype.log = function(type, msg) {
     var args = [];
 
     if (type === 'in') {
-        args.unshift(this.color('green', '[<-]'), msg);
+        args.unshift(this.termColor('green', '[<-]'), msg);
     }else if (type === 'out') {
-        args.unshift(this.color('cyan', '[->]'), msg);
+        args.unshift(this.termColor('cyan', '[->]'), msg);
     }else if (type === 'load') {
-        args.unshift(this.color('blue', '[load]'), msg);
+        args.unshift(this.termColor('blue', '[load]'), msg);
     }else if (type === 'unload') {
-        args.unshift(this.color('magenta', '[unload]'), msg);
+        args.unshift(this.termColor('magenta', '[unload]'), msg);
     }else if (type === 'error') {
-        args.unshift(this.color('red', msg));
+        args.unshift(this.termColor('red', msg));
     };
 
     console.error.apply(this, args);
@@ -209,7 +188,7 @@ Bot.prototype.msg = function(recip, what) {
 };
 
 Bot.prototype.res = function(req, what) {
-    this.log('error', JSON.stringify(req))
+    //this.log('error', JSON.stringify(req))
     try {
         var args = [];
         var channel = req.channel;
