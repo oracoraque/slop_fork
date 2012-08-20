@@ -6,14 +6,14 @@ var net    = require('net');
 
 function Bot(conf) { 
     this.config = conf;
-    require('./codes').call(this);
-    require('./colors').call(this);
+    this.writeQueue = [];
+    this.modules = [];
+
+    require('./utils/codes').call(this);
+    require('./utils/colors').call(this);
 };
 
 util.inherits(Bot, events.EventEmitter);
-
-Bot.prototype.writeQueue = [];
-Bot.prototype.modules = [];
 
 Bot.prototype.connect = function() {
     var conf = this.config;
