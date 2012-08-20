@@ -47,6 +47,7 @@ Bot.prototype.connect = function() {
 };
 
 Bot.prototype.hook = function(name, ev, fn) {
+    console.log('Hooking module',  name, ev);
 };
 
 Bot.prototype.log = function(type, msg) {
@@ -127,13 +128,12 @@ Bot.prototype.load = function(name, fn) {
         module:module
     });
 
-    var hook = this.hook.bind(this, name);
-
     if (typeof module === 'function') {
-        module.apply(this, [this, hook]);
+        module.apply(this, [this, this.hook.bind(this,name)]);
     }else {
         for (key in module) {
             var handler = module[key].bind(this);
+            this.hook(name, key, handler);
             this.on(key, handler);
         };
     };
