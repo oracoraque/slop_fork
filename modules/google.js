@@ -60,8 +60,8 @@ var Request = function Request(query, fn) {
     req.end();
 };
 
-module.exports = function(bot) {
-    bot.on('.g', function(req, res) {
+module.exports = function(bot, hook) {
+    hook('.g', function(req, res) {
         var argv = req.cmd.argv;
         if (argv.length < 1) { return };
         var query = argv.join(' ');
@@ -69,7 +69,8 @@ module.exports = function(bot) {
             if (err) {
                 res('Try again soon');
             }else {
-                res(data);
+                var colors = bot.IRC_COLORS;
+                res(colors.green+data+colors.clear);
             };
         });
     });

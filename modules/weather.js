@@ -95,8 +95,8 @@ Weather.prototype.format = function(o) {
     return res;
 };
 
-module.exports = function(bot) {
-    bot.on('.we', function(req, res) {
+module.exports = function(bot, hook) {
+    hook('.we', function(req, res) {
         var args = req.cmd.argv;
         if (args.length < 1) { return }
         var query = args.join(' ');

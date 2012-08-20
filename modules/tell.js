@@ -7,8 +7,8 @@
 
 var tells = [];
 
-module.exports = function(bot) {
-    bot.on('join', function(ev, res) {
+module.exports = function(bot, hook) {
+    hook('join', function(ev, res) {
         var joiner = ev.from.nick.toLowerCase();
         var msgs = [];
 
@@ -37,7 +37,7 @@ module.exports = function(bot) {
         });
     });
 
-    bot.on('.tell', function(req, res) {
+    hook('.tell', function(req, res) {
         var argv = req.cmd.argv;
         if (argv.length < 2) { return }        
         var rob = {
