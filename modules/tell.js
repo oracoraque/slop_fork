@@ -26,11 +26,15 @@ module.exports = function(hook) {
         msgs.forEach(function(msgx) {
             var msg = msgx[0];
             var dif = parseInt((Date.now() - msg.when) / 6e4);
-            if (dif < 1) { dif = '< 1' };
+            if (dif < 1) { 
+                dif = '< 1 minute ago';
+            }else {
+                dif = dif+' minutes ago' 
+            };
             msg = [
                 '<'+msg.from+'>',
-                '"'+msg.what+'"',
-                dif, 'minutes ago'
+                msg.what,
+                '--', dif
             ].join(' ');
             res(msg);
             tells.splice(msgx[1]);
