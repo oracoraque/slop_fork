@@ -1,6 +1,12 @@
 # pr0kbot
 
-An IRC bot for #pr0k, written in node, using Redis.
+An IRC bot for #pr0k, written in node. Features:
+
++ Simple module system
++ Loading / unloading modules dynamically in operation
++ Extensive events, reasonable parsing
++ Color formatting for IRC output
++ Master privileges, autojoin, most of the configuration and modules you expect out of the box
 
 ## Installation requirements
 
@@ -124,7 +130,7 @@ res('Cool')
 
 ## Modules
 
-pr0kbot automatically loads modules from the `/modules` directory. Modules can also be loaded or unloaded using `load` and `unload` methods. An included module (See [master]()) registers the commands `.unload` and `.load` for the bot master. This way you can add or remove modules without restarting the bot. There are two very simple module formats.
+pr0kbot automatically loads modules from the `/modules` directory. Modules can also be loaded or unloaded using `load` and `unload` methods. An included module (**See**: [master](https://github.com/Ond/pr0kbot/blob/master/modules/master.js)) registers the commands `.unload` and `.load` for the bot master. This way you can add or remove modules without restarting the bot. There are two very simple module formats.
 
 ```js
 module.exports = {
@@ -149,6 +155,8 @@ module.exports = function(hook) {
     })
 }
 ```
+
+See [/modules](https://github.com/Ond/pr0kbot/tree/master/modules) for the default modules.
 
 ## Module example
 
