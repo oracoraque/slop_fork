@@ -2,8 +2,7 @@
  * Master's privileged commands
  */
 
-module.exports = function(bot) {
-
+module.exports = function(bot, hook) {
     var master = this.config.master;
     var isMaster = function(m) {
         return master === m;
