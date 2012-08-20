@@ -24,7 +24,7 @@ function Weather(query, fn) {
             parent = figure;
         }else if (name === 'CITY' || (parent && parent[name])) {
             var data = node.attributes.DATA;
-            if (data) {
+            if (data && !weather[name]) {
                 weather[name] = data;
             }
         };
