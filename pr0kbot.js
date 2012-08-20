@@ -38,7 +38,7 @@ Bot.prototype.MODES = {
     '-i': 'deinviteonly'
 };
 
-Bot.prototype.COLORS = {
+Bot.prototype.TERM_COLORS = {
     clear:        '\u001b[0m',
     green:        '\u001b[1;32m',
     cyan:         '\u001b[1;36m',
@@ -88,7 +88,7 @@ Bot.prototype.connect = function() {
 };
 
 Bot.prototype.color = function(color, text) {
-    var colors = this.COLORS;
+    var colors = this.TERM_COLORS;
     color = colors[color.toLowerCase()] || '';
     return [color, colors.clear].join(text);
 };
@@ -123,14 +123,14 @@ Bot.prototype.getModule = function(name, fn) {
 
     for (var i=0, len=modules.length;i<len;i++) {
         var module = modules[i]
-        if (module.name === name 
-            || module.name.split('/').pop() === name) {
-                if (fn) {
-                    return fn(null, module, i);
-                }else {
-                    return module.module;
-                };
+        var isName = module.name === name;
+        if (isName || module.name.split('/').pop() === name) {
+            if (fn) {
+                return fn(null, module, i);
+            }else {
+                return module.module;
             };
+        };
     };
 
     if (fn) {
