@@ -49,6 +49,16 @@ Emitter.prototype.listeners = function(ev) {
     return res;
 };
 
+Emitter.prototype.removeListeners = function(ev) {
+    var listeners = this.listeners;
+    for (var i=0, len=listeners.length;i<len;i++) {
+        var listener = listeners[i];
+        if (!ev || listener.ev === ev) {
+            listeners.splice(i, 1);
+        };
+    };
+};
+
 Emitter.prototype.removeListener = 
 Emitter.prototype.unhook = function(ev, fn) {
     var listeners = this.listeners;
