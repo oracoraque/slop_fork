@@ -296,7 +296,7 @@ Bot.prototype.parseLine = function(line) {
         var origins = origin.split(' ');
         var sender  = origins[0];
         var code    = origins[1];
-        var event   = codes[code];
+        var event   = this.CODES[code];
         var args    = origins.slice(2, -1);
 
         switch (event) {
@@ -359,7 +359,7 @@ Bot.prototype.parseLine = function(line) {
             case 'mode':
                 var mode = origins[3];
                 var user = origins[4] || null;
-                var val = modes[mode];
+                var val = this.MODES[mode];
 
                 var req = {
                     channel:args[0],
