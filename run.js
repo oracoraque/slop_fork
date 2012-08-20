@@ -23,7 +23,7 @@ var config = require(configPath);
 //config.network = 'irc.butt.net';
 //config.master = 'Claude';
 
-/*8
+/**
  * Initialize bot
  */
 var Bot = require('./pr0kbot');
@@ -32,7 +32,6 @@ var bot = new Bot(config);
 /**
  * Load modules
  */
-
 var fs = require('fs')
 var modules = 'modules/';
 var internal = modules+'internal/';
@@ -52,7 +51,7 @@ fs.readdirSync(internal)
 .forEach(use)
 
 /**
- * Load modules
+ * Load command modules
  */
 console.log('Loading modules...');
 
