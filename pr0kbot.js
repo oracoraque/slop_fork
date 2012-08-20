@@ -125,7 +125,6 @@ Bot.prototype.load = function(name, fn) {
     }
 
     var module = require(name);
-    name = name.replace(/\.js$/, '');
     
     var mob = {
         name:name,
