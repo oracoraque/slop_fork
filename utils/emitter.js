@@ -36,8 +36,28 @@ Emitter.prototype.emit = function(ev) {
     }
 };
 
-Emitter.prototype.unHook = function(index) {
-    this.listeners.splice(index, 1);
+Emitter.prototype.findListeners = 
+Emitter.prototype.listeners = function(ev) {
+    var res = [];
+    var listeners = this.listeners;
+    for (var i=0, len=listeners.length;i<len;i++) {
+        var listener = listeners[i];
+        if (listener.ev === ev) {
+            res.push(listener.fn);
+        };
+    };
+    return res;
+};
+
+Emitter.prototype.removeListener = 
+Emitter.prototype.unhook = function(ev, fn) {
+    var listeners = this.listeners;
+    for (var i=0, len=listeners.length;i<len;i++) {
+        var listener = listeners[i];
+        if (listener.ev === ev && listener.fn === fn) {
+            listeners.splice(i, 1);
+        };
+    };
 };
 
 module.exports = Emitter
