@@ -47,6 +47,7 @@ Modify configuration in `config.json`
 
 These commands exist for the bot:
 
++ `connect` Connect to the network
 + `write` Writes raw commands to the server
 + `msg` Sends PRIVMSG to channel or user
 + `notice` Sends NOTICE to channel or user
@@ -56,7 +57,8 @@ These commands exist for the bot:
 + `identify` Identifies with NickServ
 + `load` Use a module at the given path (Alias: use)
 + `unload` Unload a module with provided name
-+ `getModule` Returns a given module, so you can conceivably interact with it
++ `termColor` Returns a term color or colorifies the second argument
++ `color` Colors text for IRC output. Arguments are: text, foreground, background
 
 ## Events
 
@@ -69,6 +71,7 @@ You may listen for any of these events:
 + `join`
 + `part`
 + `quit`
++ `names`
 + `msg`
 + `server msg`
 + `channel msg`
@@ -120,14 +123,14 @@ res('Cool')
 
 ## Modules
 
-pr0kbot automatically loads modules from the `/modules` directory. There are two very simple module formats. For an example, see the default `ping` module.
+pr0kbot automatically loads modules from the `/modules` directory. Modules can also be loaded or unloaded using `load` and `unload` methods. An included module (See [master]()) registers the commands `.unload` and `.load` for the bot master. This way you can add or remove modules without restarting the bot. There are two very simple module formats.
 
 ```js
 module.exports = {
-    event1:function(req, res) {
+    event1:function(ev, res) {
         /* handle event */
     },
-    event2:function(req, res) {
+    event2:function(ev, res) {
         /* handle event */
     }
 };
@@ -136,11 +139,11 @@ module.exports = {
 And the more liberal:
 
 ```js
-module.exports = function(bot) {
-    bot.on('event1', function(req, res) {
+module.exports = function(hook) {
+    hook('event1', function(ev, res) {
         /* handle event */
     })
-    bot.on('event2', function(req, res) {
+    hook('event2', function(ev, res) {
         /* handle event */
     })
 }
@@ -148,20 +151,59 @@ module.exports = function(bot) {
 
 ## Module example
 
-Simply place your module in the `/modules` directory, or call the `bot.load(path)` function manually, somewhere in your code. In this example we will make a command module for unloading another module.
+Simply place your module in the `/modules` directory, or call the `bot.load(path)` function manually, somewhere in your code.
+
+### Basic message echoing
+
+This bot echos everything said in a channel. I don't think you should deploy such a module.
 
 ```js
-module.exports = function(bot) {
-    bot.on('.unload', function(req, res) {
-        var module = req.argv[0];
-        if (!module) { return }
-        bot.unload(module, function(err) {
-            if (err) {
-                res('Failed to unload module '+module);
-            }else {
-                res('Unloaded module '+module);
-            };
-        });
+module.exports = {
+    'channel msg':function(ev, res) {
+        res(ev.val);
+    }
+}
+```
+
+### Referring to the bot within modules
+
+The scope of the bot is applied to each module, so `this` is equivalent, within the module, to the bot itself.
+
+```js
+module.exports = function(hook) {
+    var config = this.config;
+    hook('channel msg', function(ev, res) {
+        if (ev.val.equals('What network is this?')) {
+            res(config.network);
+        };
     });
 };
 ```
+
+### Listening for commands
+
+Here is one way to do it:
+
+```js
+module.exports = function(hook) {
+    hook('channel msg', function(ev, res) {
+        if (ev.val.startsWith('.google ')) {
+            var query = ev.val.substring(8);
+            /* query google */
+        };
+    });
+}
+```
+
+But pr0kbot allows you to listen for commands directly, and also parses useful command information.
+
+```js
+module.exports = function(hook) {
+    hook('.google', function(ev, res) {
+        var args = ev.cmd.argv;
+        /* query google with args array */
+    });
+};
+```
+
+You can also customize the command prefix in `config.json`.
