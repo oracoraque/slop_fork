@@ -123,19 +123,21 @@ Bot.prototype.load = function(name, fn) {
     name = name.replace(/\.js$/, '');
     
     this.log('load', name);
-    this.modules.push({
+    var mob = {
         name:name,
-        module:module
-    });
+        module:module,
+        hooks:[];
+    };
 
     if (typeof module === 'function') {
-        module.apply(this, [this, this.hook.bind(this,name)]);
+        module.call(this, this.hook.bind(this, name));
     }else {
         for (key in module) {
             this.hook(name, key, module[key]);
         };
     };
 
+    this.modules.push(mob);
     return cb(null, 'ok');
 };
 
@@ -145,7 +147,7 @@ Bot.prototype.unload = function(name, fn) {
 
     var unhookModule = function unhookModule(module) {
         if (typeof module === 'function') {
-
+            
         };
     }.bind(this);
 
