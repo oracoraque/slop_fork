@@ -17,7 +17,7 @@ module.exports = function(bot) {
 
     bot.on('notice', function(req, res) {
         if (req.from.nick === 'NickServ') {
-            if (req.val.startsWith('This nick is registered')) {
+            if (req.val.startsWith('This nickname is registered')) {
                 bot.identify(config.password);
             };
         };
