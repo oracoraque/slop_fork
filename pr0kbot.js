@@ -46,10 +46,6 @@ Bot.prototype.connect = function() {
     con.on('data', this.parse.bind(this));
 };
 
-Bot.prototype.hook = function(name, ev, fn) {
-   this.on(ev, fn.bind(this)); 
-};
-
 Bot.prototype.log = function(type, msg) {
     var log = this.config.log;
 
@@ -95,6 +91,13 @@ Bot.prototype.getModule = function(name, fn) {
     return cb(new Error('No such module'));
 };
 
+
+Bot.prototype.hook = function(mob, ev, fn) {
+   var func = fn.bind(this);
+   this.on(ev, func);
+   mob.hooks.push({ev:ev, fn:func});
+};
+
 Bot.prototype.use = 
 Bot.prototype.load = function(name, fn) {
     if (!/\.js$/.test(name)) {
@@ -122,22 +125,22 @@ Bot.prototype.load = function(name, fn) {
     var module = require(name);
     name = name.replace(/\.js$/, '');
     
-    this.log('load', name);
     var mob = {
         name:name,
         module:module,
-        hooks:[];
+        hooks:[]
     };
 
     if (typeof module === 'function') {
-        module.call(this, this.hook.bind(this, name));
+        module.call(this, this.hook.bind(this, mob));
     }else {
         for (key in module) {
-            this.hook(name, key, module[key]);
+            this.hook(mob, key, module[key]);
         };
     };
 
     this.modules.push(mob);
+    this.log('load', name);
     return cb(null, 'ok');
 };
 
@@ -145,16 +148,16 @@ Bot.prototype.unload = function(name, fn) {
     var modules = this.modules;
     var self = this;
 
-    var unhookModule = function unhookModule(module) {
-        if (typeof module === 'function') {
-            
-        };
-    }.bind(this);
+    var unloadModule = function(module) {
+        module.hooks.forEach(function(hook) {
+            self.unhook(hook.ev, hook.fn);
+        });
+    };
 
     this.getModule(name, function(err, module, index) {
         if (!err && module) {
             self.log('unload', module.name);
-            unhookModule(module.module);
+            unloadModule(module, index);
             self.modules.splice(index, 1);
             if (fn) { fn(null, 'ok'); };
         }else if (fn) {
@@ -195,7 +198,6 @@ Bot.prototype.msg = function(recip, what) {
 };
 
 Bot.prototype.res = function(req, what) {
-    //this.log('error', JSON.stringify(req))
     try {
         var args = [];
         var channel = req.channel;
