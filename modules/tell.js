@@ -26,6 +26,7 @@ module.exports = function(bot) {
         msgs.forEach(function(msgx) {
             var msg = msgx[0];
             var dif = parseInt((Date.now() - msg.when) / 6e4);
+            if (dif < 1) { dif = '< 1' };
             msg = [
                 msg.from, 'says:',
                 '"'+msg.what+'"',
