@@ -6,7 +6,8 @@
  * .color <fore> <back> <text>
  */
 
-module.exports = function(bot, hook)  {
+module.exports = function(hook)  {
+    var bot = this;
     hook('.color', function(ev, res) {
         var args = ev.cmd.argv;
         var fore = args[0];

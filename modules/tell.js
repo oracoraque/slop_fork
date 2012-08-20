@@ -7,7 +7,8 @@
 
 var tells = [];
 
-module.exports = function(bot, hook) {
+module.exports = function(hook) {
+    var bot = this;
     hook('join', function(ev, res) {
         var joiner = ev.from.nick.toLowerCase();
         var msgs = [];

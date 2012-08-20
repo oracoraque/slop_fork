@@ -60,7 +60,7 @@ var Request = function Request(query, fn) {
     req.end();
 };
 
-module.exports = function(bot, hook) {
+module.exports = function(hook) {
     hook('.g', function(req, res) {
         var argv = req.cmd.argv;
         if (argv.length < 1) { return };
