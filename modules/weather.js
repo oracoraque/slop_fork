@@ -91,12 +91,12 @@ Weather.prototype.format = function(o) {
 };
 
 module.exports = function(hook) {
-    var bot = this ;
     hook('.we', function(req, res) {
         var args = req.cmd.argv;
         if (args.length < 1) { return }
         var query = args.join(' ');
-        var weather = new Weather(query, function(err, data) {
+        var weather = new Weather(query,
+        function(err, data) {
             if (!err && data) {
                 res(data);
             }else {
