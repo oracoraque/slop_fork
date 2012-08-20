@@ -5,7 +5,6 @@ An IRC bot for #pr0k, written in node, using Redis.
 ## Installation requirements
 
 + **Node** [Link](http://nodejs.org/download/)
-+ **Redis** [Link](http://redis.io/download)
 
 ## Running bot
 
@@ -43,6 +42,7 @@ Modify configuration in `config.json`
 + `autojoin` List of channels to autojoin, e.g. `[ '#mychannel' ]`
 + `log` Whether or not to log input / output. Option may be boolean `true / false` or a string `in / out`
 + `command_prefix` Defaults to `.`. This allows you to listen specifically for commands
++ `master` The bot's master's nickname. With default modules the master may load (`.load`) and unload (`.unload`) modules
 
 ## Commands
 
