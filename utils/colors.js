@@ -37,6 +37,12 @@ module.exports = function() {
         };
     };
 
+    this.IRC_STYLES = {
+        bold:'\x02',
+        underline:'\x1F',
+        clear:'\x0F'
+    };
+
     this.IRC_COLORS = {
         cmd:         '\x03',
         white:       '0',
