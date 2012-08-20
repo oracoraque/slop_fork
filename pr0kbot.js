@@ -3,42 +3,19 @@ var path   = require('path');
 var events = require('events');
 var util   = require('util');
 var net    = require('net');
-var colors = require('./colors');
 
 function Bot(conf) { 
-    colors.call(this);
     this.config = conf;
+
+    /**
+     * Extend bot with response 
+     * codes and colors
+     */
+    require('./codes').call(this);
+    require('./colors').call(this);
 };
 
 util.inherits(Bot, events.EventEmitter);
-
-Bot.prototype.CODES = {
-    '001':      'connect',
-    '433':      'nickinuse',
-    '353':      'names',
-    'NOTICE':   'notice',
-    'PRIVMSG':  'msg',
-    'INVITE':   'invite',
-    'MODE':     'mode',
-    'JOIN':     'join',
-    'PART':     'part',
-    'QUIT':     'quit'
-};
-
-Bot.prototype.MODES = {
-    '+v': 'voice',
-    '-v': 'devoice',
-    '+h': 'halfop',
-    '-h': 'dehalfop',
-    '+o': 'op',
-    '-o': 'deop',
-    '+b': 'ban',
-    '-b': 'unban',
-    '+m': 'mute',
-    '-m': 'unmute',
-    '+i': 'inviteonly',
-    '-i': 'deinviteonly'
-};
 
 Bot.prototype.writeQueue = [];
 Bot.prototype.modules = [];
