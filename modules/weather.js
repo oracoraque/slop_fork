@@ -46,6 +46,8 @@ function Weather(query, fn) {
         path:'/ig/api?weather='+escape(query)
     };
 
+    console.log('Requesting', options)
+
     http.request(options, function(res) {
         res.pipe(parser);
     }).end();
@@ -100,9 +102,9 @@ Weather.prototype.format = function(o) {
 
 module.exports = function(bot) {
     bot.on('.we', function(req, res) {
-        var args = req.cmd.argv
+        var args = req.cmd.argv;
         if (args.length < 1) { return }
-        var query = args[0];
+        var query = args.join(' ');
         var weather = new Weather(query, function(err, data) {
             if (!err && data) {
                 res(data);
