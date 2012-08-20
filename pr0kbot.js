@@ -46,6 +46,8 @@ Bot.prototype.connect = function() {
     con.on('data', this.parse.bind(this));
 };
 
+Bot.prototype.hook = function(name, ev, fn) {
+};
 
 Bot.prototype.log = function(type, msg) {
     var log = this.config.log;
@@ -118,18 +120,21 @@ Bot.prototype.load = function(name, fn) {
 
     var module = require(name);
     name = name.replace(/\.js$/, '');
-
+    
     this.log('load', name);
     this.modules.push({
         name:name,
         module:module
     });
 
+    var hook = this.hook.bind(this, name);
+
     if (typeof module === 'function') {
-        module.call(this, this);
+        module.apply(this, [this, hook]);
     }else {
         for (key in module) {
-            this.on(key, module[key].bind(this));
+            var handler = module[key].bind(this);
+            this.on(key, handler);
         };
     };
 
@@ -140,10 +145,17 @@ Bot.prototype.unload = function(name, fn) {
     var modules = this.modules;
     var self = this;
 
+    var unhookModule = function unhookModule(module) {
+        if (typeof module === 'function') {
+
+        };
+    }.bind(this);
+
     this.getModule(name, function(err, module, index) {
         if (!err && module) {
             self.log('unload', module.name);
-            modules.splice(index, 1); 
+            unhookModule(module.module);
+            self.modules.splice(index, 1);
             if (fn) { fn(null, 'ok'); };
         }else if (fn) {
             fn(new Error('Module not loaded'));
