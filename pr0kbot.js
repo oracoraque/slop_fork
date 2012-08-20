@@ -1,19 +1,21 @@
 
 var path   = require('path');
-var events = require('events');
 var util   = require('util');
 var net    = require('net');
 var fs     = require('fs')
+
+var emitter = require('./utils/emitter');
 
 function Bot(conf) { 
     this.config = conf;
     this.modules = [];
 
+    emitter.call(this);
     require('./utils/codes').call(this);
     require('./utils/colors').call(this);
 };
 
-util.inherits(Bot, events.EventEmitter);
+util.inherits(Bot, emitter);
 
 Bot.prototype.connect = function() {
     var conf = this.config;
