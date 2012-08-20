@@ -6,11 +6,6 @@ var net    = require('net');
 
 function Bot(conf) { 
     this.config = conf;
-
-    /**
-     * Extend bot with response 
-     * codes and colors
-     */
     require('./codes').call(this);
     require('./colors').call(this);
 };
