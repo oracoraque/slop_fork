@@ -41,7 +41,8 @@ Modify configuration in `config.json`
 + `user_name` Desired username, e.g. `blazer`
 + `real_name` Desired real name, e.g. `Chauncey Biggums`
 + `autojoin` List of channels to autojoin, e.g. `[ '#mychannel' ]`
-+ `log` Whether or not to log input / output. Option may be boolean `true / false` or a string `in / out`.
++ `log` Whether or not to log input / output. Option may be boolean `true / false` or a string `in / out`
++ `command_prefix` Defaults to `.`. This allows you to listen specifically for commands
 
 ## Commands
 
