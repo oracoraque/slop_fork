@@ -5,21 +5,21 @@
 module.exports = function() {
 
     this.TERM_COLORS = {
-        clear:       '0',
-        green:       '1;32',
-        cyan:        '1;36',
-        red:         '1;31',
-        blue:        '1;34',
-        magenta:      '1;35m',
-        yellow:      '1;33',
-        white:       '1;37',
-        darkgreen:   '0;32',
-        darkcyan:    '0;36',
-        darkred:     '0;31',
-        darkblue:    '0;34',
-        darkagenta:  '0;35m',
-        darkyellow:  '0;33',
-        gray:        '0;37',
+        clear:        '0',
+        green:        '1;32',
+        cyan:         '1;36',
+        red:          '1;31',
+        blue:         '1;34',
+        magenta:      '1;35',
+        yellow:       '1;33',
+        white:        '1;37',
+        darkgreen:    '0;32',
+        darkcyan:     '0;36',
+        darkred:      '0;31',
+        darkblue:     '0;34',
+        darkmagenta:  '0;35',
+        darkyellow:   '0;33',
+        gray:         '0;37'
     };
 
     this.termColor = function(color, text) {
