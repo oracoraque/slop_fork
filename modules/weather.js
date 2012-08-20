@@ -83,7 +83,7 @@ Weather.prototype.format = function(o) {
     var res =  [
         o.CITY+': '+o.CONDITION,
         o.TEMP_F+'F/'+o.TEMP_C+'C',
-        '(H:'+o.HIGH+'F', 'L:'+o.LOW+'F)',
+        '(H:'+o.HIGH+'F, L:'+o.LOW+'F)',
         o.HUMIDITY,
         o.WIND_CONDITION
     ].join('; ');
