@@ -152,6 +152,28 @@ Bot.prototype.unload = function(name, fn) {
     });
 };
 
+Bot.prototype.format = function(opts, msg) {
+    if (typeof opts !== 'object') {
+        return msg;
+    };
+
+    var style = opts.style || '';
+    var fore  = opts.foreground || '';
+    var back  = opts.background || '';
+
+    if (style) {
+        var styles = this.IRC_STYLES;
+        var style = styles[style] || '';
+        msg = style + msg + styles.clear;
+    };
+
+    if (fore || back) {
+        msg = this.color(msg, fore, back);
+    };
+
+    return msg;
+};
+
 Bot.prototype.write = function(msg) {
     var msg = Array.prototype.slice.call(arguments).join(' ');
     var self = this;
