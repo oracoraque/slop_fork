@@ -24,7 +24,9 @@ Emitter.prototype.emit = function(ev) {
     var listeners = this.listeners;
     var len = listeners.length;
     if (!len) { return; }
+
     var args = Array.prototype.slice.call(arguments, 1);
+
     for (var i=0;i<len;i++) {
         var el = listeners[i];
         if (!el || !el.ev) {
@@ -66,7 +68,7 @@ Emitter.prototype.unhook = function(ev, fn) {
     var listeners = this.listeners;
     for (var i=0, len=listeners.length;i<len;i++) {
         var listener = listeners[i];
-        if (listener.ev === ev && listener.fn === fn) {
+        if (!listener || (listener.ev === ev && listener.fn === fn)) {
             listeners.splice(i, 1);
         };
     };
