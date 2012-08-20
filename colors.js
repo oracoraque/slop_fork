@@ -1,3 +1,6 @@
+/**
+ * Extend bot with colors
+ */
 
 module.exports = function() {
 
