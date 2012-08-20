@@ -60,10 +60,13 @@ Emitter.prototype.removeListeners = function(ev) {
 };
 
 Emitter.prototype.removeModule = function(module) {
+    if (!/\.js$/.test(module)) { 
+        module = module+'.js';
+    };
     var listeners = this.listeners;
     for (var i=0, len=listeners.length;i<len;i++) {
         var listener = listeners[i];
-        if (!listener || listener.module === ev) {
+        if (!listener || listener.module === module) {
             listeners.splice(i, 1);
         };
     };

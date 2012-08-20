@@ -93,13 +93,6 @@ Bot.prototype.getModule = function(name, fn) {
     return cb(new Error('No such module'));
 };
 
-
-Bot.prototype.hook = function(mob, ev, fn) {
-   var func = fn.bind(this);
-   this.on(ev, func);
-   mob.hooks.push({ev:ev, fn:func});
-};
-
 Bot.prototype.use = 
 Bot.prototype.load = function(name, fn) {
     if (!/\.js$/.test(name)) {
@@ -125,18 +118,16 @@ Bot.prototype.load = function(name, fn) {
     }
 
     var module = require(name);
-    
     var mob = {
-        name:name,
-        module:module,
-        hooks:[]
+        name:name.replace(/\.js$/, ''),
+        module:module
     };
 
     if (typeof module === 'function') {
-        module.call(this, this.hook.bind(this, mob));
+        module.call(this, this.on.bind(this, name));
     }else {
         for (key in module) {
-            this.hook(mob, key, module[key]);
+            this.on(name, key, module[key]);
         };
     };
 
@@ -149,19 +140,10 @@ Bot.prototype.unload = function(name, fn) {
     var modules = this.modules;
     var self = this;
 
-    /**
-     * Unhook event listeners
-     */
-    var unloadModule = function(module) {
-        module.hooks.forEach(function(hook) {
-            self.unhook(hook.ev, hook.fn);
-        });
-    };
-
     this.getModule(name, function(err, module, index) {
         if (!err && module) {
             self.log('unload', module.name);
-            unloadModule(module, index);
+            self.removeModule(module.name);
             self.modules.splice(index, 1);
             if (fn) { fn(null, 'ok'); };
         }else if (fn) {
