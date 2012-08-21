@@ -167,7 +167,6 @@ Bot.prototype.load = function(name, fn) {
         });
 
         for (var i=0,len=args.length;i<len;i++) {
-            console.log('Hooking', name, args[i], cb);
             this.on(name, args[i], cb);
         };
     }.bind(this, name);
