@@ -122,12 +122,6 @@ DB.prototype.del = function(bucket, key) {
     this.changes++;
 };
 
-/**
- * Getting tired at this point
- * so I don't bother with
- * callback functions
- */
-
 DB.prototype.lpush = function(bucket, val) {
     var data = this.data;
     if (!data.hasOwnProperty(bucket)) {
@@ -169,6 +163,7 @@ DB.prototype.lpluck = function(bucket, fn) {
             ret.push(item);
         }else {
             res.push(item); 
+            this.changes++;
         };
     };
     this.data[bucket] = res;
