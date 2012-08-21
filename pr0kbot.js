@@ -103,14 +103,19 @@ Bot.prototype.load = function(name, fn) {
     if (!/\.js$/.test(name)) {
         name = name + '.js';
     };
-
     name = path.resolve(name);
 
+    /**
+     * Check module already loaded
+     */
     var preExist = this.getModule(name);
     if (preExist) {
         return cb(new Error('Module already loaded'));
     };
 
+    /**
+     * Check module exists
+     */
     try {
         var stat = fs.statSync(name);
         if (!stat || !stat.isFile()) {
@@ -120,6 +125,9 @@ Bot.prototype.load = function(name, fn) {
         return cb(new Error('No such module'));
     }
 
+    /**
+     * Load module
+     */
     var module = require(name);
     var mob = {
         name:name.replace(/\.js$/, ''),
@@ -127,12 +135,19 @@ Bot.prototype.load = function(name, fn) {
     };
 
     /**
-     * Remap command prefixes
-     * for default modules
+     * Hook for easily associating
+     * modules to event listeners,
+     * makes loading and unloading
+     * a much easier task
      */
     var hook = function(name, ev, fn) {
+        /**
+        * Remap command prefixes
+        * for default modules
+        */
         if (ev.startsWith('.')) {
-            ev = this.config.command_prefix + ev.substring(1);
+            ev = this.config.command_prefix 
+            + ev.substring(1);
         };
         this.on(name, ev, fn);
     }.bind(this, name);
