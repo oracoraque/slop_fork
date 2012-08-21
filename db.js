@@ -16,7 +16,7 @@ function DB(options) {
     if (typeof options === 'object') {
         for (key in options) {
             var item = options[key];
-            if (parseInt(item)) {
+            if (parseInt(item) && this.hasOwnProperty(key)) {
                 this[key] = item;
             };
         };
