@@ -121,3 +121,54 @@ DB.prototype.del = function(bucket, key) {
     delete bucket[key];
     this.changes++;
 };
+
+/**
+ * Getting tired at this point
+ * so I don't bother with
+ * callback functions
+ */
+
+DB.prototype.lpush = function(bucket, val) {
+    var data = this.data;
+    if (!data.hasOwnProperty(bucket)) {
+        data[bucket] = [val];
+    }else {
+        data[bucket].push(val);
+    };
+    this.changes++;
+};
+
+DB.prototype.lget = function(bucket, index) {
+    var bucket = this.data[bucket];
+    if (!index) {
+        return bucket || []; 
+    } else {
+        return bucket[index]; 
+    };
+};
+
+DB.prototype.lsplice = function(bucket, ind, len) {
+    this.changes++;
+    return (this.data[bucket] || []).splice(ind, len);
+};
+
+DB.prototype.lmap = function(bucket, fn) {
+   return (this.data[bucket] || []).map(fn);
+};
+
+DB.prototype.lfilter = function(bucket, fn) {
+   return (this.data[bucket] || []).filter(fn);
+};
+
+DB.prototype.lpluck = function(bucket, fn) {
+    var ret = [];
+    bucket = this.data[bucket] || [];
+    for (var i=0, len=bucket.length;i<len;i++) {
+        var item = bucket[i];
+        if (fn(item)) {
+            ret.push(item);
+            bucket.splice(i, 1);
+        };
+    };
+    return ret;
+};
