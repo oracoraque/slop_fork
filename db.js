@@ -48,11 +48,9 @@ function DB(options) {
     setInterval(writeInterval, this.interval);
 };
 
-DB.prototype.data = {};
-
 DB.prototype.add = function(prop, val) {
     this.data[prop] = val;
-    this.writes++;
+    this.changes++;
 };
 
 DB.prototype.get = function(prop, fn) {
@@ -66,5 +64,6 @@ DB.prototype.get = function(prop, fn) {
 
 DB.prototype.del = function(prop) {
     delete this.data[prop];
+    this.changes++;
 };
 
