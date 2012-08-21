@@ -145,16 +145,31 @@ Bot.prototype.load = function(name, fn) {
      * makes loading and unloading
      * a much easier task
      */
-    var hook = function(name, ev, fn) {
+    var hook = function() {
+        var args = Array.prototype.slice.call(arguments);
+        var name = args.shift();
+        var cb = function(){};
+        if (typeof args[args.length-1] === 'function') {
+           cb = args.pop(); 
+        };
+
         /**
         * Remap command prefixes
         * for default modules
         */
-        if (ev.startsWith('.')) {
-            ev = this.config.command_prefix 
-            + ev.substring(1);
+        var prefix = this.config.command_prefix;
+        args = args.map(function(ev) {
+            if (ev.startsWith('.')) {
+                return prefix + ev.substring(1);
+            }else {
+                return ev;
+            };
+        });
+
+        for (var i=0,len=args.length;i<len;i++) {
+            console.log('Hooking', name, args[i], cb);
+            this.on(name, args[i], cb);
         };
-        this.on(name, ev, fn);
     }.bind(this, name);
 
     if (typeof module === 'function') {
