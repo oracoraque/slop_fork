@@ -92,7 +92,7 @@ module.exports = function(hook) {
         return ret.join(' ~ ');
     }.bind(this);
 
-    hook('.y', function(ev, res) {
+    hook('.y', '.yt', '.youtube', function(ev, res) {
         var args = ev.cmd.argv;
         if (!args.length) { return; }
         var query = args.join(' ');
