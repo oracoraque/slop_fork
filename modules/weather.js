@@ -39,7 +39,7 @@ function Weather(query, fn) {
         if (!self.testProps(weather)) {
             fn(new Error('Invalid req'));
         }else {
-            fn(null, self.format(weather));
+            fn(null, weather);
         }
     });
 
@@ -78,23 +78,22 @@ Weather.prototype.testProps = function(o) {
     });
 };
 
-Weather.prototype.format = function(o) {
-    var res =  [
-        o.CITY+': '+o.CONDITION,
-        o.TEMP_F+'F/'+o.TEMP_C+'C',
-        '(H:'+o.HIGH+'F, L:'+o.LOW+'F)',
-        o.HUMIDITY,
-        o.WIND_CONDITION
-    ].join('; ');
-    return res;
-};
-
 module.exports = function(hook) {
     var db = this.db;
 
+    var format = function(o) {
+        var res =  [
+            o.CITY+': '+o.CONDITION,
+            o.TEMP_F+'F/'+o.TEMP_C+'C',
+            '(H:'+o.HIGH+'F, L:'+o.LOW+'F)',
+            o.HUMIDITY,
+            o.WIND_CONDITION
+        ].join('; ');
+        return res;
+    }.bind(this);
+
     hook('.we', function(req, res) {
         var key = 'weather:'+req.from.host;
-
         var query = req.cmd.argv.join(' ') || db.get(key);
         if (!query) {
             return;
@@ -103,7 +102,7 @@ module.exports = function(hook) {
         var weather = new Weather(query,
         function(err, data) {
             if (!err && data) {
-                res(data);
+                res(format(data));
                 db.add(key, query);
             }else {
                 res('Please try again');
