@@ -49,17 +49,17 @@ var search = function(query, fn) {
 };
 
 module.exports = function(hook) {
-//    hook('.g', function(req, res) {
-//        var argv = req.cmd.argv;
-//        if (argv.length < 1) { return };
-//        var query = argv.join(' ');
-//
-//        search(query, function(err, data) {
-//            if (err) {
-//                res('Try again soon');
-//            }else {
-//                res(data);
-//            };
-//        });
-//    });
+    hook('.g', function(req, res) {
+        var argv = req.cmd.argv;
+        if (argv.length < 1) { return };
+        var query = argv.join(' ');
+
+        search(query, function(err, data) {
+            if (err) {
+                res('Try again soon');
+            }else {
+                res(data);
+            };
+        });
+    });
 };
