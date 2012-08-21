@@ -1,7 +1,6 @@
 
 /**
  * Retrieves weather data
- * using hidden Google API
  *
  * Command signature: 
  * .we <args>
@@ -91,14 +90,22 @@ Weather.prototype.format = function(o) {
 };
 
 module.exports = function(hook) {
+    var db = this.db;
+
     hook('.we', function(req, res) {
-        var args = req.cmd.argv;
-        if (args.length < 1) { return }
-        var query = args.join(' ');
+        var host = req.from.host;
+        var key = host+':weather';
+
+        var query = req.cmd.argv.join(' ') || db.get(key);
+        if (!query) {
+            return;
+        };
+
         var weather = new Weather(query,
         function(err, data) {
             if (!err && data) {
                 res(data);
+                db.add(key, query);
             }else {
                 res('Please try again');
             };
