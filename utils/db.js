@@ -11,7 +11,7 @@
  * `del` (prop)
  */
 
-require(__dirname+'/utils/string_extens');
+require(__dirname+'/string_extens');
 
 var fs = require('fs');
 
