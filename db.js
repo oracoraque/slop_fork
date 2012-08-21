@@ -1,26 +1,26 @@
+/**
+ * Little in-memory JSON 
+ * database. Autosaves 
+ * after five minutes,
+ * or every five changes.
+ *
+ * Methods:
+ *
+ * `get` (prop) - synch or asynch
+ * `add` (prop, val)
+ * `del` (prop)
+ */
 
 var fs = require('fs');
 
 module.exports = DB;
 
 function DB(options) {
-    this.writes = 0; //Write count
-    this.writeLim = 5; //After five writes, save always
+    this.changes = 0; //Write count
+    this.changeLim = 5 || options.changeLim; //Save after five changes
+    this.interval = 500 || options.interval; //Interval ms precision
     this.fiveMins = 1000 * 60 * 5; //Save also after five minutes
     this.lastSave = Date.now(); 
-    this.interval = 500; //Interval ms precision
-
-    /**
-     * Options
-     */
-    if (typeof options === 'object') {
-        for (key in options) {
-            var item = options[key];
-            if (parseInt(item) && this.hasOwnProperty(key)) {
-                this[key] = item;
-            };
-        };
-    };
 
     /**
      * Load json dump
@@ -36,16 +36,19 @@ function DB(options) {
      */
     var writeInterval = function() {
         try {
-            if (this.writes >= this.writeLim 
+            if (this.changes >= this.changeLim 
                 || (Date.now() - this.lastSave > this.fiveMins)) {
-                fs.writeFile('dump.json', JSON.stringify(this.data),
-                function(err) { if (err) { console.log(err); }; });
-            };
+                    fs.writeFile('dump.json', JSON.stringify(this.data),
+                    function(err) { if (err) { console.log(err); }; });
+                    this.lastSave = Date.now();
+                };
         }catch(exception){}
     }.bind(this);
 
     setInterval(writeInterval, this.interval);
 };
+
+DB.prototype.data = {};
 
 DB.prototype.add = function(prop, val) {
     this.data[prop] = val;
@@ -64,3 +67,4 @@ DB.prototype.get = function(prop, fn) {
 DB.prototype.del = function(prop) {
     delete this.data[prop];
 };
+
