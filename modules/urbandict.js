@@ -5,50 +5,59 @@
  * .ud <args>
  */
 
-//var http = require('http');
-//
-//var Request = function(query, fn) {
-//
-//    var options = {
-//        host:'urbanscraper.herokuapp.com',
-//        path:'/define/'+query+'.json'
-//    };
-//
-//    var req = http.request(options, function(res) {
-//        var data = '';
-//        res.on('error', fn);
-//
-//        res.on('data', function(d) {
-//            data += d;
-//        });
-//
-//        res.on('end', function() {
-//            try {
-//                data = JSON.parse(data);
-//                console.log(data);
-//
-//                var url = data.url;
-//                var def = data.definition;
-//                var indDot = data.definition.indexOf('.');
-//
-//                if (indDot > 100) {
-//                    def = def.substring(0, 100);
-//                }else {
-//                    def = def.substring(0, indDot );
-//                };
-//                def += '...'
-//
-//                return fn(null, url, def);
-//            }catch(exception) {
-//                return fn(exception);
-//            };
-//        });
-//    });
-//
-//    req.on('error', fn);
-//    req.end();
-//};
-//
-//Request(process.argv.slice(2).join('+'), function(err, url, def) {
-//    console.log(err, url, def);
-//});
+var http = require(__dirname+'/../utils/http');
+
+var search = function(query, fn) {
+    query = escape(query.replace(' ', '+'));
+    var options = {
+        host:'urbanscraper.herokuapp.com',
+        path:'/define/'+query+'.json',
+        json:true
+    };
+
+    http.request(options, function(err, data) {
+        if (err) { return fn(err); };
+        try {
+            var word = data.word.replace('+', ' ');
+            var url = data.url;
+            var def = data.definition;
+            var indDot = data.definition.indexOf('.') || 0;
+
+            if (indDot > 100 || indDot < 10) {
+                def = def.substring(0, 100);
+            }else {
+                def = def.substring(0, indDot );
+            };
+            def += '...'
+
+            return fn(null, {
+                word:word,
+                url:url,
+                def:def
+            });
+
+        }catch(exception) {
+            return fn(exception);
+        };
+    });
+};
+
+module.exports = function(hook) {
+    var bold = this.format.bind(this, {style:'bold'});
+
+    hook('.u', '.ud', '.urban', function(ev, res) {
+        var args = ev.cmd.argv;
+        if (!args.length) { return; }
+        var query = args.join(' ');
+        search(query, function(err, data) {
+            if (err) {
+                return res('Try again soon');
+            };
+            var str = [
+                bold(data.word+':'),
+                data.def, data.url
+            ].join(' ');
+            res(str);
+        });
+    });
+};
