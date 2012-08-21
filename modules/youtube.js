@@ -5,9 +5,12 @@
  * .y <args>
  */
 
-//http://gdata.youtube.com/feeds/api/videos/Y4MnpzG5Sqc?v=2&alt=jsonc
-
 var http = require(__dirname+'/../utils/http');
+var host = 'gdata.youtube.com';
+var base = '/feeds/api/videos';
+var search_base = base+'?v=2&alt=jsonc&max-results=1&q=%q';
+var idsearch_base = base+'%q?v=2&alt=jsonc';
+var re = /http:\/\/(?:www\.)?youtube\.com\/watch\?.*v=(\w+)/;
 
 var formatDuration = function(s) {
     s = parseInt(s);
@@ -28,13 +31,10 @@ var thouSep = function(str) {
 };
 
 
-var search = function(query, fn) {
-    query = escape(query.replace(' ', '+'));
-    var options = {
-        host:'gdata.youtube.com',
-        path:'/feeds/api/videos?v=2&alt=jsonc&max-results=1&q='+query,
-        json:true
-    };
+var search = function(options, fn) {
+    var query = escape(options.query.replace(' ', '+'));
+    options.path = options.path.replace('%q', query);
+    console.log('Searching', options)
 
     http.request(options, function(err, data) {
         try {
@@ -96,10 +96,42 @@ module.exports = function(hook) {
         var args = ev.cmd.argv;
         if (!args.length) { return; }
         var query = args.join(' ');
-        search(query, function(err, data) {
-            if (err) { return res('Not video have found'); }
-            res(format(data));
+        var options = {
+            host:host,
+            path:search_base,
+            json:true,
+            query:args.join(' ')
+        };
+
+        search(options, function(err, data) {
+            if (err) {
+                res('Not video have found'); 
+            }else {
+                res(format(data));
+            };
         });
+    });
+
+    hook('channel msg', function(ev, res) {
+        var id = re.exec(ev.val);
+        if (!id) { return; }
+        id = id[1];
+
+        var options = {
+            host:host,
+            path:search_base,
+            json:true,
+            query:id
+        };
+
+        search(options, function(err, data) {
+            if (err) {
+                res('Not video have found'); 
+            }else {
+                res(format(data));
+            };
+        });
+
     });
 
 };
