@@ -41,14 +41,17 @@ var search = function(query, fn) {
                 title:data.title,
                 link:base_url+data.id,
                 views:formatViews(data.viewCount),
-                duration:formatDuration(data.duration)
+                duration:formatDuration(data.duration),
+                rating:data.rating,
+                ratings:data.ratingCount,
+                comments:data.commentCount,
+                allowComments:data.accessControl.comment
             });
         }catch(exception) {
             return fn(exception)
         };
     });
 };
-
 
 module.exports = function(hook) {
     hook('.y', function(ev, res) {
@@ -65,6 +68,8 @@ module.exports = function(hook) {
             var str = [
                 bold(data.title),
                 'length '+bold(data.duration),
+                'comments '+bold(data.comments)+' ('+data.allowComments+')',
+                'rating '+bold(data.rating)+' ('+data.ratings+')',
                 'views '+bold(data.views),
                 'link '+bold(data.link)
                 ].join(' - ');
