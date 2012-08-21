@@ -13,6 +13,9 @@ function Bot(conf) {
     emitter.call(this);
     require('./utils/codes').call(this);
     require('./utils/colors').call(this);
+
+    var DB = require('./db');
+    this.db = new DB();
 };
 
 util.inherits(Bot, emitter);
@@ -95,14 +98,15 @@ Bot.prototype.getModule = function(name, fn) {
 
 Bot.prototype.use = 
 Bot.prototype.load = function(name, fn) {
+    var cb = typeof fn === 'function' 
+    ? fn : function(){};
+
     if (!/\.js$/.test(name)) {
         name = name + '.js';
     };
 
     name = path.resolve(name);
-    var cb = typeof fn === 'function' 
-    ? fn : function(){};
-    
+
     var preExist = this.getModule(name);
     if (preExist) {
         return cb(new Error('Module already loaded'));
@@ -132,6 +136,7 @@ Bot.prototype.load = function(name, fn) {
     };
 
     this.modules.push(mob);
+
     this.log('load', name);
     return cb(null, 'ok');
 };
