@@ -19,7 +19,7 @@ function DB(options) {
     this.changes = 0; //Write count
     this.changeLim = 5 || options.changeLim; //Save after five changes
     this.interval = 500 || options.interval; //Interval ms precision
-    this.fiveMins = 1000 * 60 * 5; //Save also after five minutes
+    this.maxInterval = 1000 * 60 * 5; //Save after five minutes
     this.lastSave = Date.now(); 
 
     /**
@@ -37,7 +37,7 @@ function DB(options) {
     var writeInterval = function() {
         try {
             if (this.changes >= this.changeLim 
-                || (Date.now() - this.lastSave > this.fiveMins)) {
+                || (Date.now() - this.lastSave > this.maxInterval)) {
                     fs.writeFile('dump.json', JSON.stringify(this.data),
                     function(err) { if (err) { console.log(err); }; });
                     this.lastSave = Date.now();
