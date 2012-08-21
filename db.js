@@ -15,12 +15,19 @@ var fs = require('fs');
 
 module.exports = DB;
 
-function DB(options) {
-    this.changes = 0; //Write count
-    this.changeLim = 5 || options.changeLim; //Save after five changes
-    this.interval = 500 || options.interval; //Interval ms precision
-    this.maxInterval = 1000 * 60 * 5; //Save after five minutes
+function DB(opts) {
+    opts = opts || {};
+
+    this.changes = 0;
+    this.maxChanges = opts.maxChanges || 5;
+    this.interval = opts.interval || 500;
+    this.maxInterval = opts.maxInterval || 1000 * 60 * 5;
     this.lastSave = Date.now(); 
+
+    Object.defineProperty(this, 'data', {
+        value:{},
+        enumerable:false
+    });
 
     /**
      * Load json dump
@@ -31,39 +38,65 @@ function DB(options) {
         this.data = {};
     }
 
+    var shouldSave = function(maxChanges, maxInterval) {
+        var now = Date.now();
+        var last = this.lastSave;
+        return this.changes >= maxChanges || now - last > maxInterval;
+    }.bind( this, this.maxChanges, this.maxInterval );
+
     /**
      * Initialize write queue
      */
     var writeInterval = function() {
         try {
-            if (this.changes >= this.changeLim 
-                || (Date.now() - this.lastSave > this.maxInterval)) {
-                    fs.writeFile('dump.json', JSON.stringify(this.data),
-                    function(err) { if (err) { console.log(err); }; });
-                    this.lastSave = Date.now();
-                };
+            if (shouldSave()) {
+                fs.writeFile('dump.json', JSON.stringify(this.data));
+                this.lastSave = Date.now();
+                this.changes = 0;
+            };
         }catch(exception){}
     }.bind(this);
 
     setInterval(writeInterval, this.interval);
 };
 
-DB.prototype.add = function(prop, val) {
-    this.data[prop] = val;
-    this.changes++;
-};
+DB.prototype.get = function(bucket, key, fn) {
+    bucket = this.data[bucket];
 
-DB.prototype.get = function(prop, fn) {
-    var item = this.data[prop];
-    if (fn) {
-        return fn(!!item ? null : new Error('No such item'), item);
+    var fnExists = fn && typeof fn === 'function';
+    if (!bucket || typeof bucket !== 'object') {
+        if (fnExists) {
+            return fn(new Error('Invalid bucket'));
+        }else {
+            return null;
+        };
+    };
+
+    var item = bucket[key];
+    if (fnExists) {
+        fn(!!item ? null : new Error('Invalid  key'), item);
     }else {
         return item || null; 
     };
 };
 
-DB.prototype.del = function(prop) {
-    delete this.data[prop];
+DB.prototype.add = function(bucket, key, val) {
+    var data = this.data;
+    if (!data.hasOwnProperty(bucket)) {
+        var el = {};
+        el[key] = val;
+        data[bucket] = el;
+    }else {
+        data[bucket][key] = val;
+    };
     this.changes++;
 };
 
+DB.prototype.del = function(bucket, key) {
+    var bucket = this.data[bucket];
+    if (!bucket || !bucket.hasOwnProperty(key)) {
+        return;
+    }
+    delete bucket[key];
+    this.changes++;
+};
