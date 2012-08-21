@@ -127,16 +127,26 @@ Bot.prototype.load = function(name, fn) {
         module:module
     };
 
+    /**
+     * Remap command prefixes
+     * for default modules
+     */
+    var hook = function(name, ev, fn) {
+        if (ev.startsWith('.')) {
+            ev = this.config.command_prefix + ev.substring(1);
+        };
+        this.on(name, ev, fn);
+    }.bind(this, name);
+
     if (typeof module === 'function') {
-        module.call(this, this.on.bind(this, name));
+        module.call(this, hook);
     }else {
         for (key in module) {
-            this.on(name, key, module[key]);
+            hook(key, module[key]);
         };
     };
 
     this.modules.push(mob);
-
     this.log('load', name);
     return cb(null, 'ok');
 };
