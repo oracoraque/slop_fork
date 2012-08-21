@@ -14,7 +14,8 @@ function Bot(conf) {
     require('./utils/colors').call(this);
 
     var DB = require('./db');
-    this.db = new DB();
+    var opts = {maxInterval:1000 * 10};
+    this.db = new DB(opts);
 };
 
 util.inherits(Bot, emitter);
