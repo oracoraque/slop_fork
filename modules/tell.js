@@ -16,8 +16,8 @@ module.exports = function(hook) {
 
     hook('join', function(ev, res) {
         var joiner = ev.from.nick.toLowerCase();
-        var msgs = db.lpluck('tells', function(tell) {
-            return tell.who === joiner;
+        var msgs = db.lpluck('tells', function(i) {
+            return i.who === joiner;
         });
 
         var numMsgs = msgs.length;
@@ -33,9 +33,9 @@ module.exports = function(hook) {
             };
 
             msg = [
-                '<'+msg.from+'>',
+                bold('<'+msg.from+'>'),
                 msg.what,
-                '~ ', bold(dif)
+                '~', bold(dif)
             ].join(' ');
 
             res(msg);
