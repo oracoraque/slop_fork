@@ -58,17 +58,17 @@ module.exports = function(hook) {
         var bot = this;
         search(query, function(err, data) {
             if (err) {
-                res('Not video have found');
-            }else {
-                var bold = bot.format.bind(bot, {style:'bold'});
-                var str = [
-                   bold(data.title),
-                   'length '+bold(data.duration),
-                   'views '+bold(data.views),
-                   'link '+bold(data.link)
+                return res('Not video have found');
+            }
+
+            var bold = bot.format.bind(bot, {style:'bold'});
+            var str = [
+                bold(data.title),
+                'length '+bold(data.duration),
+                'views '+bold(data.views),
+                'link '+bold(data.link)
                 ].join(' - ');
-                res(str);
-            };
+            res(str);
         });
     });
 };
