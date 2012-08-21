@@ -12,26 +12,19 @@ module.exports = function(hook) {
      */
 
     var db = this.db;
-    var tells = db.get('tells') || [];
     var bold = this.format.bind(this, {style:'bold'});
 
     hook('join', function(ev, res) {
         var joiner = ev.from.nick.toLowerCase();
-        var msgs = [];
-
-        for (var i=0, len=tells.length;i<len;i++) {
-            var mm = tells[i];
-            if (mm.who === joiner) {
-                msgs.push([mm, i]);
-            };
-        };
+        var msgs = db.lpluck('tells', function(tell) {
+            return tell.who === joiner;
+        });
 
         var numMsgs = msgs.length;
         if (!numMsgs) { return }
         res('You have '+numMsgs+' new messages');
 
-        msgs.forEach(function(msgx) {
-            var msg = msgx[0];
+        msgs.forEach(function(msg) {
             var dif = parseInt((Date.now() - msg.when) / 6e4);
             if (dif < 2) { 
                 dif = (dif || '<1') + ' minute ago';
@@ -46,10 +39,7 @@ module.exports = function(hook) {
             ].join(' ');
 
             res(msg);
-            tells.splice(msgx[1]);
         });
-
-        db.add('tells', tells);
     });
 
     hook('.tell', function(req, res) {
@@ -57,13 +47,11 @@ module.exports = function(hook) {
         if (argv.length < 2) { return }        
         var rob = {
             from:req.from.nick,
-            who:argv[0],
+            who:argv[0].toLowerCase(),
             what:argv.slice(1).join(' '),
             when:Date.now()
         };
-
-        tells.push(rob);
-        db.add('tells', tells);
+        db.lpush('tells', rob);
         res('I will pass that along');
     });
 };
