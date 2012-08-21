@@ -163,9 +163,9 @@ DB.prototype.lpluck = function(bucket, fn) {
             ret.push(item);
         }else {
             res.push(item); 
-            this.changes++;
         };
     };
     this.data[bucket] = res;
+    this.changes++;
     return ret;
 };
