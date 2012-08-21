@@ -13,13 +13,7 @@ function Bot(conf) {
     require('./utils/codes').call(this);
     require('./utils/colors').call(this);
 
-    var DB = require('./db');
-    var opts = {
-        maxChanges:3,
-        maxInterval:1000 * 10
-    };
-
-    this.db = new DB(opts);
+    this.db = new(require('./utils/db'));
 };
 
 util.inherits(Bot, emitter);

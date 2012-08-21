@@ -2,7 +2,6 @@
 var http = require('http');
 
 module.exports.request = function(options, fn) {
-
     var req = http.request(options, function(res) {
         var data = '';
         res.on('error', fn);

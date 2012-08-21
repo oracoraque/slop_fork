@@ -2,7 +2,7 @@
 /**
  * String extensions
  */
-require('./strings');
+require('./utils/string_extens');
 
 /**
  * Load configuration
@@ -16,12 +16,13 @@ var config = require(configPath);
  * Set config programmatically
  */
 
-//config.autojoin = ['#testx'];
-//config.nick_name = 'mynick';
-//config.user_name = 'myuser';
-//config.real_name = 'myname';
-//config.network = 'irc.butt.net';
-//config.master = 'Claude';
+config.autojoin = ['#testq'];
+config.nick_name = 'SubFunctor';
+config.user_name = 'Func';
+config.password = 'boogie69';
+config.network = 'irc.synirc.net';
+config.master = 'Functor';
+config.command_prefix = '$';
 
 /**
  * Initialize bot
@@ -35,7 +36,7 @@ var bot = new Bot(config);
 var fs = require('fs')
 var modules = 'modules/';
 var internal = modules+'internal/';
-var use = bot.use.bind(bot);
+var load = bot.load.bind(bot);
 var restrictJs = function(i) {
     return /\.js$/.test(i);
 }
@@ -48,20 +49,21 @@ console.log('Loading internal modules...');
 fs.readdirSync(internal)
 .filter(restrictJs)
 .map(function(module) {return internal+module})
-.forEach(use)
+.forEach(load)
 
 /**
  * Load command modules
  */
-console.log('Loading modules...');
+console.log('Loading command modules...');
 
 fs.readdirSync(modules)
 .filter(restrictJs)
 .map(function(module) {return modules+module})
-.forEach(use)
+.forEach(load)
 
 /**
  * Finally, connect
  *
  */
+
 bot.connect();

@@ -62,7 +62,7 @@ var search = function(options, fn) {
 
 module.exports = function(hook) {
 
-    var format = function(o) {
+    var format = function(o, hideLink) {
         var bold = this.format.bind(this, {style:'bold'});
         var uploaded = o.uploaded;
         uploaded = uploaded.substring(0, uploaded.indexOf('T'));
@@ -88,7 +88,9 @@ module.exports = function(hook) {
         };
 
         ret.push('views '+bold(o.views));
-        ret.push('link '+bold(o.link));
+        if (!hideLink) {
+            ret.push('link '+bold(o.link));
+        };
         return ret.join(' ~ ');
     }.bind(this);
 
@@ -128,7 +130,7 @@ module.exports = function(hook) {
             if (err) {
                 res('Not video have found'); 
             }else {
-                res(format(data));
+                res(format(data), true);
             };
         });
 
