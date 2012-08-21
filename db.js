@@ -11,6 +11,8 @@
  * `del` (prop)
  */
 
+require(__dirname+'/utils/string_extens');
+
 var fs = require('fs');
 
 module.exports = DB;
@@ -60,8 +62,21 @@ function DB(opts) {
     setInterval(writeInterval, this.interval);
 };
 
+DB.prototype.keySep = function(str) {
+    var index = str.indexOf(':');
+    return {
+        key:str.substring(index+1),
+        bucket:str.substring(0, index)
+    }
+};
+
 DB.prototype.get = function(bucket, key, fn) {
-    bucket = this.data[bucket];
+    if (bucket.contains(':')) {
+        if (!fn) { fn = key; }
+        var ret = this.keySep(bucket);
+        bucket = this.data[ret.bucket];
+        key = ret.key;
+    };
 
     var fnExists = fn && typeof fn === 'function';
     if (!bucket || typeof bucket !== 'object') {
@@ -81,6 +96,12 @@ DB.prototype.get = function(bucket, key, fn) {
 };
 
 DB.prototype.add = function(bucket, key, val) {
+    if (bucket.contains(':')) {
+        if (!val) { val = key; }
+        var ret = this.keySep(bucket, key);
+        bucket = ret.bucket;
+        key = ret.key;
+    };
     var data = this.data;
     if (!data.hasOwnProperty(bucket)) {
         var el = {};
