@@ -93,8 +93,7 @@ module.exports = function(hook) {
     var db = this.db;
 
     hook('.we', function(req, res) {
-        var host = req.from.host;
-        var key = host+':weather';
+        var key = 'weather:'+req.from.host;
 
         var query = req.cmd.argv.join(' ') || db.get(key);
         if (!query) {

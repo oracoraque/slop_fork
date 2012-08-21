@@ -5,6 +5,8 @@
  * .y <args>
  */
 
+//http://gdata.youtube.com/feeds/api/videos/Y4MnpzG5Sqc?v=2&alt=jsonc
+
 var http = require(__dirname+'/../utils/http');
 
 var formatDuration = function(s) {
@@ -15,15 +17,16 @@ var formatDuration = function(s) {
     return mins+':'+secs;
 };
 
-var formatViews = function(views) {
+var thouSep = function(str) {
     var res = [];
-    views = String(views).split('').reverse();
-    for (var i=0, len=views.length;i<len;i+=3) {
-        var slice = views.slice(i, i+3);
+    str = String(str).split('').reverse();
+    for (var i=0, len=str.length;i<len;i+=3) {
+        var slice = str.slice(i, i+3);
         res = res.concat(slice, ',');
     };
     return res.reverse().join('').substring(1);
 };
+
 
 var search = function(query, fn) {
     query = escape(query.replace(' ', '+'));
@@ -40,12 +43,16 @@ var search = function(query, fn) {
             return fn(null, {
                 title:data.title,
                 link:base_url+data.id,
-                views:formatViews(data.viewCount),
+                views:thouSep(data.viewCount),
                 duration:formatDuration(data.duration),
                 rating:data.rating,
                 ratings:data.ratingCount,
-                comments:data.commentCount,
-                allowComments:data.accessControl.comment
+                likes:data.likeCount,
+                allowRate:data.accessControl.rate,
+                comments:thouSep(data.commentCount),
+                allowComments:data.accessControl.comment,
+                uploaded:data.uploaded,
+                uploader:data.uploader
             });
         }catch(exception) {
             return fn(exception)
@@ -54,26 +61,45 @@ var search = function(query, fn) {
 };
 
 module.exports = function(hook) {
+
+    var format = function(o) {
+        var bold = this.format.bind(this, {style:'bold'});
+        var uploaded = o.uploaded;
+        uploaded = uploaded.substring(0, uploaded.indexOf('T'));
+
+        var ret = [
+            bold(o.title),
+            'length '+bold(o.duration),
+            'by '+bold(o.uploader) +
+            ' on '+bold(uploaded)
+        ];
+
+        if (o.allowRate === 'denied') {
+            ret.push(bold('RATING DISABLED'));
+        }else {
+            var rating = ~~(parseInt(o.likes) / parseInt(o.ratings) * 100) + '%';
+            ret.push('rating '+bold(rating)+' of '+bold(thouSep(o.ratings)));
+        };
+
+        if (o.allowComments === 'denied') {
+            ret.push(bold('COMMENTS DISABLED'));
+        }else {
+            ret.push('comments '+bold(o.comments));
+        };
+
+        ret.push('views '+bold(o.views));
+        ret.push('link '+bold(o.link));
+        return ret.join(' ~ ');
+    }.bind(this);
+
     hook('.y', function(ev, res) {
         var args = ev.cmd.argv;
         if (!args.length) { return; }
         var query = args.join(' ');
-        var bot = this;
         search(query, function(err, data) {
-            if (err) {
-                return res('Not video have found');
-            }
-
-            var bold = bot.format.bind(bot, {style:'bold'});
-            var str = [
-                bold(data.title),
-                'length '+bold(data.duration),
-                'comments '+bold(data.comments)+' ('+data.allowComments+')',
-                'rating '+bold(data.rating)+' ('+data.ratings+')',
-                'views '+bold(data.views),
-                'link '+bold(data.link)
-                ].join(' - ');
-            res(str);
+            if (err) { return res('Not video have found'); }
+            res(format(data));
         });
     });
+
 };
