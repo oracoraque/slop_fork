@@ -92,7 +92,7 @@ module.exports = function(hook) {
         return res;
     }.bind(this);
 
-    hook('.we', function(req, res) {
+    hook('.we', '.weather', function(req, res) {
         var key = 'weather:'+req.from.host;
         var query = req.cmd.argv.join(' ') || db.get(key);
         if (!query) {
