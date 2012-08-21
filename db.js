@@ -161,14 +161,16 @@ DB.prototype.lfilter = function(bucket, fn) {
 };
 
 DB.prototype.lpluck = function(bucket, fn) {
-    var ret = [];
-    bucket = this.data[bucket] || [];
-    for (var i=0, len=bucket.length;i<len;i++) {
-        var item = bucket[i];
+    var ret = [], res = [];
+    var data = this.data[bucket] || [];
+    for (var i=0, len=data.length;i<len;i++) {
+        var item = data[i]
         if (fn(item)) {
             ret.push(item);
-            bucket.splice(i, 1);
+        }else {
+            res.push(item); 
         };
     };
+    this.data[bucket] = res;
     return ret;
 };
