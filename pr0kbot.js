@@ -3,7 +3,6 @@ var path    = require('path');
 var util    = require('util');
 var net     = require('net');
 var fs      = require('fs');
-var redis   = require('redis');
 var emitter = require('./utils/emitter');
 
 function Bot(conf) { 
