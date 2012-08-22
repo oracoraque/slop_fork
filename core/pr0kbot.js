@@ -15,6 +15,7 @@ var colors  = require(__dirname+'/colors');
 function Bot(conf) { 
     this.config = conf;
     this.db = new(db);
+    this.cmds = {};
     this.help = {};
     this.modules = [];
 
@@ -126,7 +127,6 @@ Bot.prototype.getHelp = function(what) {
 
     if (module) {
         var help = this.help[module.replace(this.baseDir, '\u262D')];
-        console.log('Foundhelp', help, what);
         if (typeof help === 'object') {
             help = help[what];
         };
