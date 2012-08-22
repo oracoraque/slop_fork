@@ -104,9 +104,14 @@ Bot.prototype.getModule = function(name, fn) {
 };
 
 Bot.prototype.getHelp = function(what) {
+    if (!what) { 
+        return null;
+    };
+
     var module = this.listeners.filter(function(i) {
         return i.ev === what || i.ev.substring(1) === what;
     })[0];
+
     if (module) {
         var help = this.help[module.module];
         return help || 'No help provided for command: '+what;
