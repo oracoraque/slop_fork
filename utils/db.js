@@ -26,44 +26,45 @@ module.exports = DB;
 function DB(opts) {
     opts = opts || {};
 
-    this.data        = {};
-    this.changes     = 0;
+    this.data     = {};
+    this.changes  = 0;
+    this.lastSave = Date.now();
+    this.location = opts.location || __dirname+'/dump.json';
 
-    var location    = opts.location || __dirname+'/dump.json';
     var maxChanges  = opts.maxChanges || 3;
-    var interval    = opts.interval || 500;
     var maxInterval = opts.maxInterval || 1000 * 10;
-    var lastSave    = Date.now();
+    var interval    = opts.interval || 500;
+
+    var shouldSave = function() {
+        var dT = Date.now() - this.lastSave;
+        return this.changes >= maxChanges || dT > maxInterval;
+    }.bind(this);
 
     /**
      * Load json dump
      */
     try {
-        this.data = JSON.parse(fs.readFileSync(location, 'utf8'));
+        this.data = JSON.parse(fs.readFileSync(this.location, 'utf8'));
     }catch(exception) { 
         this.data = {};
     }
 
-    var shouldSave = function() {
-        var now = Date.now();
-        var last = this.lastSave;
-        return this.changes >= maxChanges || now - last > maxInterval;
-    }.bind(this);
 
     /**
      * Initialize write queue
      */
     var writeInterval = function() {
-        try {
-            if (shouldSave()) {
-                fs.writeFile(location, JSON.stringify(this.data));
-                this.lastSave = Date.now();
-                this.changes = 0;
-            };
-        }catch(exception){}
+        if (!shouldSave()){return;};
+        try {this.save();}catch(e){};
     }.bind(this);
 
     setInterval(writeInterval, interval);
+};
+
+DB.prototype.save = function() {
+    fs.writeFile(this.location, JSON.stringify(this.data));
+    this.lastSave = Date.now();
+    this.changes = 0;
 };
 
 DB.prototype.keySep = function(str) {
@@ -139,8 +140,9 @@ DB.prototype.del = function(bucket, key) {
 };
 
 DB.prototype.delAll = function(bucket) {
-    bucket = this.data[bucket];
-    if (bucket) {
+    if (this.data.hasOwnProperty(bucket)) {
         delete this.data[bucket];
+        this.changes++;
     };
 };
+
