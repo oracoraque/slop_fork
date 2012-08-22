@@ -15,7 +15,7 @@ var colors  = require(__dirname+'/colors');
 function Bot(conf) { 
     this.config = conf;
     this.db = new(db);
-    this.cmds = {};
+    this.cmds = [];
     this.help = {};
     this.modules = [];
 
@@ -107,9 +107,7 @@ Bot.prototype.getModule = function(name, fn) {
 };
 
 Bot.prototype.getHelp = function(what) {
-    if (!what) { 
-        return null;
-    };
+    if (!what) { return null; };
 
     var prefix = this.config.command_prefix;
     if (!what.startsWith(prefix)) {
@@ -160,12 +158,14 @@ Bot.prototype.hook = function() {
             var remap = prefix+args[1].substring(1);
             help[remap] = args[2];
             this.help[name] = help;
+            this.help[remap] = args[2];
         }else {
             this.help[name] = args[1];
         };
         return;
     }else if (arg0 === 'main') {
-        
+        var remap = prefix+args[1].substring(1);
+        return this.cmds.push(remap);
     };
 
     args = args.map(function(ev) {
