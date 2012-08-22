@@ -80,7 +80,7 @@ Weather.prototype.testProps = function(o) {
 
 module.exports = function(hook) {
 
-    hook('help', 'Usage: .we <city or zip>');
+    hook('help', 'Usage: .we <city or zip>; Aliases: .weather, .we');
 
     var db = this.db;
     var format = function(o) {

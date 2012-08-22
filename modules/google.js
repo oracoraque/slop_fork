@@ -50,7 +50,7 @@ var search = function(query, fn) {
 
 module.exports = function(hook) {
 
-    hook('help', 'Usage: .g <query>');
+    hook('help', 'Usage: .g <query>; Aliases: .google, .goog, .g');
 
     hook('.g', '.goog', '.google', function(req, res) {
         var argv = req.cmd.argv;
