@@ -9,6 +9,7 @@ module.exports = function() {
         '001':      'connect',
         '433':      'nickinuse',
         '353':      'names',
+        '311':      'whois',
         'NOTICE':   'notice',
         'PRIVMSG':  'msg',
         'INVITE':   'invite',
