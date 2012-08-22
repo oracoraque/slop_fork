@@ -85,7 +85,8 @@ Bot.prototype.log = function(type, msg) {
 
 Bot.prototype.getModule = function(name, fn) {
     var modules = this.modules;
-    name = path.resolve(name).replace(/\.js$/, '');
+    name = ['\u262D', name.replace(this.baseDir, '')
+    .replace(/\.js$/, '')].join('/');
 
     var cb = typeof fn === 'function'
     ? fn : function(){}
@@ -143,19 +144,13 @@ Bot.prototype.hook = function() {
 
     if (args[0] === 'help') {
         name = name.replace(this.baseDir, '\u262D');
-        if (typeof args[1] === 'function') {
-
-        }else {
-            return this.help[name] = args[1];
-        };
+        return this.help[name] = args[1];
     };
 
     var prefix = this.config.command_prefix;
     args = args.map(function(ev) {
         if (ev.startsWith('.')) {
             return prefix + ev.substring(1);
-        }else if (ev.equals('help')) {
-            
         }else {
             return String(ev);
         };
@@ -199,6 +194,10 @@ Bot.prototype.load = function(name, fn) {
      * Load module
      */
     var module = require(name);
+    this.log('load', name);
+
+    name = name.replace(this.baseDir, '\u262D');
+
     var mob = {
         name:name.replace(/\.js$/, ''),
         module:module
@@ -212,16 +211,9 @@ Bot.prototype.load = function(name, fn) {
      */
 
     var hook = this.hook.bind(this, name);
-    if (typeof module === 'function') {
-        module.call(this, hook);
-    }else {
-        for (key in module) {
-            hook(key, module[key]);
-        };
-    };
-
+    module.call(this, hook);
     this.modules.push(mob);
-    this.log('load', name);
+
     return cb(null, 'ok');
 };
 
