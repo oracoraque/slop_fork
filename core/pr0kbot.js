@@ -110,11 +110,15 @@ Bot.prototype.getHelp = function(what) {
         return null;
     };
 
+    var prefix = this.config.command_prefix;
+    if (!what.startsWith(prefix)) {
+       what = prefix+what;
+    };
+
     var listeners = this.listeners, module;
     for (var i=0, len=listeners.length;i<len;i++) {
         var item = listeners[i];
-        var ev = item.ev;
-        if (ev === what || ev.substring(1) === what) {
+        if (item.ev === what) {
             module = item.module;
             break;
         };
@@ -122,6 +126,10 @@ Bot.prototype.getHelp = function(what) {
 
     if (module) {
         var help = this.help[module.replace(this.baseDir, '\u262D')];
+        console.log('Foundhelp', help, what);
+        if (typeof help === 'object') {
+            help = help[what];
+        };
         return help || 'No help provided for command: '+what;
     }else {
         return 'No module associated for comamnd: '+what;
@@ -142,16 +150,24 @@ Bot.prototype.hook = function() {
         cb = args.pop(); 
     };
 
-    if (args[0] === 'help') {
-        name = name.replace(this.baseDir, '\u262D');
-        if (typeof args[1] === 'function') {
+    var prefix = this.config.command_prefix;
+    var arg0 = args[0];
 
+    if (arg0 === 'help') {
+        name = name.replace(this.baseDir, '\u262D');
+        if (args.length === 3) {
+            var help = this.help[name] || {};
+            var remap = prefix+args[1].substring(1);
+            help[remap] = args[2];
+            this.help[name] = help;
         }else {
-            return this.help[name] = args[1];
+            this.help[name] = args[1];
         };
+        return;
+    }else if (arg0 === 'main') {
+        
     };
 
-    var prefix = this.config.command_prefix;
     args = args.map(function(ev) {
         if (ev.startsWith('.')) {
             return prefix + ev.substring(1);
