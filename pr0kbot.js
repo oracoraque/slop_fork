@@ -251,10 +251,7 @@ Bot.prototype.res = function(req, what) {
     try {
         var args = [];
         var channel = req.channel;
-        var nick = ''
-        if (req.from && req.from.nick) {
-            nick = req.from.nick;
-        };
+        var nick = req.from.nick;
         if (channel) {
             args.push(channel);
             what = nick ? (nick+': '+what) : what;
@@ -332,12 +329,12 @@ Bot.prototype.parseLine = function(line) {
             return; 
         };
 
-        var dest    = colons[2];
-        var origins = origin.split(' ');
-        var sender  = origins[0];
-        var code    = origins[1];
-        var event   = this.CODES[code];
-        var args    = origins.slice(2, -1);
+        var dest    = colons[2]
+          , origins = origin.split(' ')
+          , sender  = origins[0]
+          , code    = origins[1]
+          , event   = this.CODES[code]
+          , args    = origins.slice(2, -1);
 
         switch (event) {
             case 'connect':
@@ -355,6 +352,10 @@ Bot.prototype.parseLine = function(line) {
                 dest = colons.slice(2).join(':');
                 sender = this.parseSender(sender);
 
+                /**
+                 * Test if user is ignored
+                 */
+
                 var toChan = /^#/.test(args[0]);
                 var req = {
                     from:sender,
@@ -363,28 +364,15 @@ Bot.prototype.parseLine = function(line) {
                     raw:line
                 };
 
-                if (/^(join|part)$/.test(event)) {
-                    req.channel = dest;
-                }else if (toChan) {
+                if (toChan) {
                     req.channel = args[0];
+                }else if (/^(join|part)$/.test(event)) {
+                    req.channel = dest;
                 };
 
                 var res = this.res.bind(this, req);
 
                 this.emit(event, req, res);
-
-                var prefix = this.config.command_prefix;
-                if (dest.startsWith(prefix)) {
-                    var inds = dest.indexOf(' ');
-                    var sub = dest;
-                    var argv = [];
-                    if (inds !== -1) {
-                        sub = dest.substring(0, inds);
-                        argv = dest.substring(inds+1).split(' ');
-                    };
-                    req.cmd = {name:sub, argv:argv}
-                    this.emit(sub, req, res);
-                };
 
                 if (toChan) {
                     this.emit('channel '+event, req, res);
@@ -395,7 +383,34 @@ Bot.prototype.parseLine = function(line) {
                 if (parseInt(code)) {
                     this.emit(code, req, res);
                 };
-            break;
+
+                /**
+                 * Emit command event, if
+                 * sender is not ignored
+                 */
+                var prefix = this.config.command_prefix;
+                if (!sender || !dest.startsWith(prefix)) { 
+                    return;
+                };
+
+                var ignoreKey = 'ignore:'+sender.nick.toLowerCase();
+                if (this.db.get(ignoreKey)) {
+                    return;
+                };
+
+                var inds = dest.indexOf(' ')
+                  , sub = dest
+                  , argv = [];
+
+                if (inds !== -1) {
+                    sub = dest.substring(0, inds);
+                    argv = dest.substring(inds+1).split(' ');
+                };
+
+                req.cmd = {name:sub, argv:argv}
+                this.emit(sub, req, res);
+
+                break;
             case 'mode':
                 var mode = origins[3];
                 var user = origins[4] || null;
