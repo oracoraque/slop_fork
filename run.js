@@ -16,18 +16,12 @@ var config = require(configPath);
  * Set config programmatically
  */
 
-config.autojoin = ['#testq'];
-config.nick_name = 'SubFunctor';
-config.user_name = 'Func';
-config.password = 'boogie69';
-config.network = 'irc.synirc.net';
-config.master = 'Functor';
-config.command_prefix = '$';
+config.autojoin = [];
 
 /**
  * Initialize bot
  */
-var Bot = require('./pr0kbot');
+var Bot = require(__dirname+'/core/pr0kbot');
 var bot = new Bot(config);
 
 /**
