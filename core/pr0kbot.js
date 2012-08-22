@@ -17,7 +17,6 @@ function Bot(conf) {
     this.db = new(db);
     this.help = {};
     this.modules = [];
-    this.baseDir = path.resolve(__dirname+'/../modules');
 
     emitter.call(this);
     codes.call(this);
@@ -25,6 +24,9 @@ function Bot(conf) {
 };
 
 util.inherits(Bot, emitter);
+
+Bot.prototype.baseDir = path.resolve(__dirname+'/../modules');
+Bot.prototype.baseComp = '\u262D';
 
 Bot.prototype.connect = function() {
     var conf = this.config;
@@ -85,7 +87,7 @@ Bot.prototype.log = function(type, msg) {
 
 Bot.prototype.getModule = function(name, fn) {
     var modules = this.modules;
-    name = ['\u262D', name.replace(this.baseDir, '')
+    name = [this.baseComp, name.replace(this.baseDir, '')
     .replace(/\.js$/, '')].join('/');
 
     var cb = typeof fn === 'function'
@@ -121,7 +123,7 @@ Bot.prototype.getHelp = function(what) {
     };
 
     if (module) {
-        var help = this.help[module.replace(this.baseDir, '\u262D')];
+        var help = this.help[module.replace(this.baseDir, this.baseComp)];
         return help || 'No help provided for command: '+what;
     }else {
         return 'No module associated for comamnd: '+what;
@@ -143,7 +145,7 @@ Bot.prototype.hook = function() {
     };
 
     if (args[0] === 'help') {
-        name = name.replace(this.baseDir, '\u262D');
+        name = name.replace(this.baseDir, this.baseComp);
         return this.help[name] = args[1];
     };
 
@@ -196,7 +198,7 @@ Bot.prototype.load = function(name, fn) {
     var module = require(name);
     this.log('load', name);
 
-    name = name.replace(this.baseDir, '\u262D')
+    name = name.replace(this.baseDir, this.baseComp)
     .replace(/\.js$/, '');
 
     var mob = {
