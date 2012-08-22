@@ -7,7 +7,9 @@
 
 module.exports = function(hook) {
 
-    hook('help', 'Usage: .tell <who> <what>');
+    hook('main', '.tell');
+    hook('help', '.tell', 'Send a memo to user. Usage: .tell <who> <what>');
+    hook('help', '.showtells', 'Show all tells with a max of 8');
 
     var db = this.db;
     var bold = this.format.bind(this, {style:'bold'});

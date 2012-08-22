@@ -64,7 +64,8 @@ var search = function(query, fn) {
 
 module.exports = function(hook) {
 
-    hook('help', 'Usage: .wiki <query>; Aliases: .wikipedia, .wiki, .w');
+    hook('main', '.wikipedia');
+    hook('help', 'Searches wikipedia. Usage: .wikipedia <query>; Aliases: .wiki, .w');
 
     var format = function(data) {
         var bold = this.format.bind(this, {style:'bold'});
