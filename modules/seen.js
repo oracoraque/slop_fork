@@ -10,17 +10,7 @@
 
 module.exports = function(hook) {
     var bold = this.format.bind(this, {style:'bold'});
-
     var db = this.db;
-    hook('join', function(ev, res) {
-        var nick = ev.from.nick.toLowerCase();
-        var key = 'seen:'+nick;
-
-        db.add(key, {
-            when:Date.now(),
-            join:ev.val
-        });
-    });
 
     hook('channel msg', function(ev, res) {
         var nick = ev.from.nick.toLowerCase();
@@ -28,7 +18,7 @@ module.exports = function(hook) {
 
         db.add(key, {
             when:Date.now(),
-            said:ev.val
+            did:ev.val
         });
     });
 
@@ -42,16 +32,13 @@ module.exports = function(hook) {
             if (err) {
                 return res('I have no seen information for "'+who+'"');
             };
+
             var when = Date.now() - data.when;
             when = ~~(when / 6e4 + 0.5) +' minutes ago';
-            var act = '';
-            if (data.join) {
-                act = 'joining '+data.join
-            }else if (data.said) {
-                act = 'saying: '+data.said
-            };
             var str = [bold(who),
-                'last seen', when, act].join(' ');
+                'last seen', when, 
+                'saying:', data.did
+            ].join(' ');
             res(str);
         });
     });
