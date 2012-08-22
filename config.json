@@ -10,5 +10,7 @@
   ],
   "log": true,
   "command_prefix":".",
-  "master":"master_nick"
+  "masters":[
+    "Functor"
+  ]
 }
