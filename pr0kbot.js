@@ -255,10 +255,10 @@ Bot.prototype.res = function(req, what) {
         if (req.from && req.from.nick) {
             nick = req.from.nick;
         };
-        if (typeof channel !== 'undefined') {
+        if (channel) {
             args.push(channel);
-            what = nick+': '+what;
-        }else {
+            what = nick ? (nick+': '+what) : what;
+        }else if (nick) {
             args.push(nick); 
         };
         args.push(what);
