@@ -50,6 +50,8 @@ var search = function(query, fn) {
 
 module.exports = function(hook) {
 
+    hook('help', 'Usage: .g <query>');
+
     hook('.g', '.goog', '.google', function(req, res) {
         var argv = req.cmd.argv;
         if (argv.length < 1) { return };

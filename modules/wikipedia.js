@@ -62,9 +62,9 @@ var search = function(query, fn) {
     req.end();
 };
 
-//search('butt', console.log)
-
 module.exports = function(hook) {
+
+    hook('help', 'Usage: .wiki <query>');
 
     var format = function(data) {
         var bold = this.format.bind(this, {style:'bold'});

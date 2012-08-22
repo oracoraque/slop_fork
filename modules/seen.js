@@ -9,6 +9,9 @@
 
 
 module.exports = function(hook) {
+
+    hook('help', 'Usage: .seen <nick>');
+
     var bold = this.format.bind(this, {style:'bold'});
     var db = this.db;
 

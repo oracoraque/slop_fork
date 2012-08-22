@@ -35,6 +35,7 @@ var getTitle = function(u, fn) {
 };
 
 module.exports = function(hook) {
+
     hook('channel msg', function(ev) {
         var val = ev.val.split(' ')
         .filter(function(i) {

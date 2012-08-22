@@ -62,6 +62,8 @@ var search = function(options, fn) {
 
 module.exports = function(hook) {
 
+    hook('help', 'Usage: .yt <query>');
+
     var format = function(o, hideLink) {
         var bold = this.format.bind(this, {style:'bold'});
         var uploaded = o.uploaded;

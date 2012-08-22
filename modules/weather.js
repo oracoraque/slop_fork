@@ -79,8 +79,10 @@ Weather.prototype.testProps = function(o) {
 };
 
 module.exports = function(hook) {
-    var db = this.db;
 
+    hook('help', 'Usage: .we <city or zip>');
+
+    var db = this.db;
     var format = function(o) {
         var res =  [
             o.CITY+': '+o.CONDITION,
@@ -93,6 +95,7 @@ module.exports = function(hook) {
     }.bind(this);
 
     hook('.we', '.weather', function(req, res) {
+
         var key = 'weather:'+req.from.host;
         var query = req.cmd.argv.join(' ') || db.get(key);
         if (!query) {

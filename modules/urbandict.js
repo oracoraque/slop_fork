@@ -45,6 +45,8 @@ var search = function(query, fn) {
 module.exports = function(hook) {
     var bold = this.format.bind(this, {style:'bold'});
 
+    hook('help', 'Usage: .ud <query>');
+
     hook('.u', '.ud', '.urban', function(ev, res) {
         var args = ev.cmd.argv;
         if (!args.length) { return; }

@@ -7,9 +7,7 @@
 
 module.exports = function(hook) {
 
-    /**
-    * Load tells from database
-    */
+    hook('help', 'Usage: .tell <who> <what>');
 
     var db = this.db;
     var bold = this.format.bind(this, {style:'bold'});
@@ -88,4 +86,5 @@ module.exports = function(hook) {
         db.add('tell_'+who, when, rob); 
         res('I will pass that along');
     });
+
 };
