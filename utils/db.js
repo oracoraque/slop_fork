@@ -14,37 +14,34 @@
 require(__dirname+'/string_extens');
 
 var fs = require('fs');
-
 module.exports = DB;
 
 function DB(opts) {
     opts = opts || {};
 
-    this.changes = 0;
-    this.maxChanges = opts.maxChanges || 3;
-    this.interval = opts.interval || 500;
-    this.maxInterval = opts.maxInterval || 1000 * 10;
-    this.lastSave = Date.now(); 
+    this.data        = {};
+    this.changes     = 0;
 
-    Object.defineProperty(this, 'data', {
-        value:{},
-        enumerable:false
-    });
+    var location    = opts.location || __dirname+'/dump.json';
+    var maxChanges  = opts.maxChanges || 3;
+    var interval    = opts.interval || 500;
+    var maxInterval = opts.maxInterval || 1000 * 10;
+    var lastSave    = Date.now();
 
     /**
      * Load json dump
      */
     try {
-        this.data = JSON.parse(fs.readFileSync('dump.json'));
+        this.data = JSON.parse(fs.readFileSync(location, 'utf8'));
     }catch(exception) { 
         this.data = {};
     }
 
-    var shouldSave = function(maxChanges, maxInterval) {
+    var shouldSave = function() {
         var now = Date.now();
         var last = this.lastSave;
         return this.changes >= maxChanges || now - last > maxInterval;
-    }.bind( this, this.maxChanges, this.maxInterval );
+    }.bind(this);
 
     /**
      * Initialize write queue
@@ -52,14 +49,14 @@ function DB(opts) {
     var writeInterval = function() {
         try {
             if (shouldSave()) {
-                fs.writeFile('dump.json', JSON.stringify(this.data));
+                fs.writeFile(location, JSON.stringify(this.data));
                 this.lastSave = Date.now();
                 this.changes = 0;
             };
         }catch(exception){}
     }.bind(this);
 
-    setInterval(writeInterval, this.interval);
+    setInterval(writeInterval, interval);
 };
 
 DB.prototype.keySep = function(str) {
@@ -133,9 +130,9 @@ DB.prototype.lpush = function(bucket, val) {
 };
 
 DB.prototype.lget = function(bucket, index) {
-    var bucket = this.data[bucket];
+    var bucket = this.data[bucket] || [];
     if (!index) {
-        return bucket || []; 
+        return bucket;
     } else {
         return bucket[index]; 
     };
