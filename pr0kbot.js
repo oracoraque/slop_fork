@@ -94,7 +94,32 @@ Bot.prototype.getModule = function(name, fn) {
     return cb(new Error('No such module'));
 };
 
-Bot.prototype.use = 
+Bot.prototype.hook = function() {
+    var args = Array.prototype.slice.call(arguments);
+    var name = args.shift();
+    var cb = function(){};
+    if (typeof args[args.length-1] === 'function') {
+        cb = args.pop(); 
+    };
+
+    /**
+    * Remap command prefixes
+    * for default modules
+    */
+    var prefix = this.config.command_prefix;
+    args = args.map(function(ev) {
+        if (ev.startsWith('.')) {
+            return prefix + ev.substring(1);
+        }else {
+            return String(ev);
+        };
+    });
+
+    for (var i=0,len=args.length;i<len;i++) {
+        this.on(name, args[i], cb);
+    };
+};
+
 Bot.prototype.load = function(name, fn) {
     var cb = typeof fn === 'function' 
     ? fn : function(){};
@@ -139,32 +164,8 @@ Bot.prototype.load = function(name, fn) {
      * makes loading and unloading
      * a much easier task
      */
-    var hook = function() {
-        var args = Array.prototype.slice.call(arguments);
-        var name = args.shift();
-        var cb = function(){};
-        if (typeof args[args.length-1] === 'function') {
-           cb = args.pop(); 
-        };
 
-        /**
-        * Remap command prefixes
-        * for default modules
-        */
-        var prefix = this.config.command_prefix;
-        args = args.map(function(ev) {
-            if (ev.startsWith('.')) {
-                return prefix + ev.substring(1);
-            }else {
-                return ev;
-            };
-        });
-
-        for (var i=0,len=args.length;i<len;i++) {
-            this.on(name, args[i], cb);
-        };
-    }.bind(this, name);
-
+    var hook = this.hook.bind(this, name);
     if (typeof module === 'function') {
         module.call(this, hook);
     }else {
@@ -289,6 +290,10 @@ Bot.prototype.ajoin = function() {
     };
 };
 
+Bot.prototype.whois = function(who) {
+    this.write('WHOIS', who);
+};
+
 Bot.prototype.parseSender = function(msg) {
     try {
         msg = msg.split('!');
@@ -349,6 +354,7 @@ Bot.prototype.parseLine = function(line) {
             case 'part':
             case 'names':
             case 'nickinuse':
+            case 'whois':
                 dest = colons.slice(2).join(':');
                 sender = this.parseSender(sender);
 
