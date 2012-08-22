@@ -3,8 +3,9 @@
  * to PING events
  */
 
-module.exports = {
-    ping:function(who) {
+module.exports = function(hook) {
+    hook('ping', function(who) {
         this.pong(who);
-    }
+    });
 };
+

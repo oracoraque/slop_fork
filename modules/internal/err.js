@@ -3,8 +3,8 @@
  * logs error events
  */
 
-module.exports = {
-    error:function(err) {
+module.exports = function(hook) {
+    hook('error', function(err) {
         this.log('error', err);
-    }
+    });
 };
