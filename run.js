@@ -16,7 +16,7 @@ var config = require(configPath);
  * Set config programmatically
  */
 
-config.autojoin = [];
+//config.autojoin = ['#somn'];
 
 /**
  * Initialize bot
