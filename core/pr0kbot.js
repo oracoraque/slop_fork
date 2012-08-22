@@ -15,6 +15,7 @@ var colors  = require(__dirname+'/colors');
 function Bot(conf) { 
     this.config = conf;
     this.db = new(db);
+    this.help = {};
     this.modules = [];
 
     emitter.call(this);
@@ -102,6 +103,18 @@ Bot.prototype.getModule = function(name, fn) {
     return cb(new Error('No such module'));
 };
 
+Bot.prototype.getHelp = function(what) {
+    var module = this.listeners.filter(function(i) {
+        return i.ev === what || i.ev.substring(1) === what;
+    })[0];
+    if (module) {
+        var help = this.help[module.module];
+        return help || 'No help provided for command: '+what;
+    }else {
+        return 'No module associated what comamnd: '+what;
+    }
+};
+
 Bot.prototype.hook = function() {
     /**
      * Event hooker. Remaps
@@ -116,10 +129,20 @@ Bot.prototype.hook = function() {
         cb = args.pop(); 
     };
 
+    if (args[0] === 'help') {
+        if (typeof args[1] === 'function') {
+
+        }else {
+            return this.help[name] = args[1];
+        };
+    };
+
     var prefix = this.config.command_prefix;
     args = args.map(function(ev) {
         if (ev.startsWith('.')) {
             return prefix + ev.substring(1);
+        }else if (ev.equals('help')) {
+            
         }else {
             return String(ev);
         };
