@@ -78,9 +78,11 @@ DB.prototype.get = function(bucket, key, fn) {
     if (bucket.contains(':')) {
         if (!fn) { fn = key; }
         var ret = this.keySep(bucket);
-        bucket = this.data[ret.bucket];
+        bucket = ret.bucket;
         key = ret.key;
     };
+
+    bucket = this.data[bucket]
 
     var fnExists = fn && typeof fn === 'function';
     if (!bucket || typeof bucket !== 'object') {
