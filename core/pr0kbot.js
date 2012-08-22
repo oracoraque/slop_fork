@@ -17,6 +17,7 @@ function Bot(conf) {
     this.db = new(db);
     this.help = {};
     this.modules = [];
+    this.baseDir = path.resolve(__dirname+'/../modules');
 
     emitter.call(this);
     codes.call(this);
@@ -24,9 +25,6 @@ function Bot(conf) {
 };
 
 util.inherits(Bot, emitter);
-
-Bot.prototype.baseDir = path.resolve(__dirname+'/../modules');
-Bot.prototype.baseComp = '\u262D';
 
 Bot.prototype.connect = function() {
     var conf = this.config;
@@ -87,8 +85,7 @@ Bot.prototype.log = function(type, msg) {
 
 Bot.prototype.getModule = function(name, fn) {
     var modules = this.modules;
-    name = [this.baseComp, name.replace(this.baseDir, '')
-    .replace(/\.js$/, '')].join('/');
+    name = path.resolve(name).replace(/\.js$/, '');
 
     var cb = typeof fn === 'function'
     ? fn : function(){}
@@ -123,7 +120,7 @@ Bot.prototype.getHelp = function(what) {
     };
 
     if (module) {
-        var help = this.help[module.replace(this.baseDir, this.baseComp)];
+        var help = this.help[module.replace(this.baseDir, '\u262D')];
         return help || 'No help provided for command: '+what;
     }else {
         return 'No module associated for comamnd: '+what;
@@ -145,14 +142,20 @@ Bot.prototype.hook = function() {
     };
 
     if (args[0] === 'help') {
-        name = name.replace(this.baseDir, this.baseComp);
-        return this.help[name] = args[1];
+        name = name.replace(this.baseDir, '\u262D');
+        if (typeof args[1] === 'function') {
+
+        }else {
+            return this.help[name] = args[1];
+        };
     };
 
     var prefix = this.config.command_prefix;
     args = args.map(function(ev) {
         if (ev.startsWith('.')) {
             return prefix + ev.substring(1);
+        }else if (ev.equals('help')) {
+            
         }else {
             return String(ev);
         };
@@ -170,6 +173,7 @@ Bot.prototype.load = function(name, fn) {
     if (!/\.js$/.test(name)) {
         name = name + '.js';
     };
+
     name = path.resolve(name);
 
     /**
@@ -196,13 +200,8 @@ Bot.prototype.load = function(name, fn) {
      * Load module
      */
     var module = require(name);
-    this.log('load', name);
-
-    name = name.replace(this.baseDir, this.baseComp)
-    .replace(/\.js$/, '');
-
     var mob = {
-        name:name,
+        name:name.replace(/\.js$/, ''),
         module:module
     };
 
@@ -215,8 +214,9 @@ Bot.prototype.load = function(name, fn) {
 
     var hook = this.hook.bind(this, name);
     module.call(this, hook);
-    this.modules.push(mob);
 
+    this.modules.push(mob);
+    this.log('load', name);
     return cb(null, 'ok');
 };
 
