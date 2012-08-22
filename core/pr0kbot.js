@@ -17,7 +17,6 @@ function Bot(conf) {
     this.db = new(db);
     this.help = {};
     this.modules = [];
-    this.baseDir = path.resolve(__dirname+'/../modules');
 
     emitter.call(this);
     codes.call(this);
@@ -25,6 +24,8 @@ function Bot(conf) {
 };
 
 util.inherits(Bot, emitter);
+
+Bot.prototype.baseDir = path.resolve(__dirname+'/../modules');
 
 Bot.prototype.connect = function() {
     var conf = this.config;
