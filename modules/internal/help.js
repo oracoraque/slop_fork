@@ -6,12 +6,13 @@
 
 module.exports = function(hook) {
 
+    hook('main', '.help');
     hook('help', 'Usage: .help <command>');
 
     hook('.help', function(ev, res) {
         var args = ev.cmd.argv;
         if (!args.length) {
-            return res('Need arg');
+            return res(this.cmds.join(' '));
         };
 
         var help = this.getHelp(ev.cmd.argv[0]);
