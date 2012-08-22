@@ -294,6 +294,10 @@ Bot.prototype.whois = function(who) {
     this.write('WHOIS', who);
 };
 
+Bot.prototype.isMaster = function(who) {
+    return this.config.masters.indexOf(who) !== -1;
+};
+
 Bot.prototype.parseSender = function(msg) {
     try {
         msg = msg.split('!');
@@ -399,7 +403,7 @@ Bot.prototype.parseLine = function(line) {
                     return;
                 };
 
-                var ignoreKey = 'ignore:'+sender.nick.toLowerCase();
+                var ignoreKey = 'ignore:'+sender.host.toLowerCase();
                 if (this.db.get(ignoreKey)) {
                     return;
                 };
