@@ -101,6 +101,16 @@ DB.prototype.get = function(bucket, key, fn) {
     };
 };
 
+DB.prototype.getAll = function(bucket, fn) {
+    bucket = this.data[bucket] || null;
+    var fnExists = fn && typeof fn === 'function';
+    if (fnExists) {
+        return fn(bucket ? null : new Error('Invalid bucket'), bucket);
+    }else {
+        return bucket;
+    };
+};
+
 DB.prototype.add = function(bucket, key, val) {
     if (bucket.contains(':')) {
         if (!val) { val = key; }
@@ -120,7 +130,7 @@ DB.prototype.add = function(bucket, key, val) {
 };
 
 DB.prototype.del = function(bucket, key) {
-    var bucket = this.data[bucket];
+    bucket = this.data[bucket];
     if (!bucket || !bucket.hasOwnProperty(key)) {
         return;
     }
@@ -128,50 +138,9 @@ DB.prototype.del = function(bucket, key) {
     this.changes++;
 };
 
-DB.prototype.lpush = function(bucket, val) {
-    var data = this.data;
-    if (!data.hasOwnProperty(bucket)) {
-        data[bucket] = [val];
-    }else {
-        data[bucket].push(val);
+DB.prototype.delAll = function(bucket) {
+    bucket = this.data[bucket];
+    if (bucket) {
+        delete this.data[bucket];
     };
-    this.changes++;
-};
-
-DB.prototype.lget = function(bucket, index) {
-    var bucket = this.data[bucket] || [];
-    if (!index) {
-        return bucket;
-    } else {
-        return bucket[index]; 
-    };
-};
-
-DB.prototype.lsplice = function(bucket, ind, len) {
-    this.changes++;
-    return (this.data[bucket] || []).splice(ind, len);
-};
-
-DB.prototype.lmap = function(bucket, fn) {
-   return (this.data[bucket] || []).map(fn);
-};
-
-DB.prototype.lfilter = function(bucket, fn) {
-   return (this.data[bucket] || []).filter(fn);
-};
-
-DB.prototype.lpluck = function(bucket, fn) {
-    var ret = [], res = [];
-    var data = this.data[bucket] || [];
-    for (var i=0, len=data.length;i<len;i++) {
-        var item = data[i]
-        if (fn(item)) {
-            ret.push(item);
-        }else {
-            res.push(item); 
-        };
-    };
-    this.data[bucket] = res;
-    this.changes++;
-    return ret;
 };
