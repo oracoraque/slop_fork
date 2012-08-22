@@ -106,7 +106,7 @@ You may also listen for arbitrary modes with +mode / -mode, e.g. `+v`. The `msg`
 This is a standard event listener which captures the `join` event. This handler is called when a user joins a channel.
 
 ```js
-bot.on('join', function(ev, res) {
+hook('join', function(ev, res) {
 
 });
 ```
@@ -128,6 +128,22 @@ Command listeners, e.g. `.google` or `.weather` will receive a `cmd` property wh
 ```js
 res('Cool')
 ```
+
+### Multi-event listeners
+
+You may listen for any number of events very simply:
+
+```js
+module.exports = function(hook) {
+    hook('.google', 'names', 'part', function(ev, res) {
+        res('Interesting theory');
+    });
+};
+```
+
+### Default command prefixes
+
+Default pr0kbot modules are prefixed with the character `.`. These modules do not break when you modify the command prefix, because the event listeners are mapped appropriately to the current command prefix. In summary: The default modules will always work, even if you change command prefix.
 
 ## Modules
 
