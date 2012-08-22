@@ -116,7 +116,7 @@ Bot.prototype.getHelp = function(what) {
         var help = this.help[module.module];
         return help || 'No help provided for command: '+what;
     }else {
-        return 'No module associated what comamnd: '+what;
+        return 'No module associated for comamnd: '+what;
     }
 };
 
