@@ -1,24 +1,16 @@
 
-var dir = function(d) {
-    var self = __dirname+'/';
-    var dirs = {
-        self:self,
-        utils:self+'../utils/'
-    };
-    return function(file) {
-        return dirs[d]+file;    
-    };
-};
+/**
+ * An IRC bot
+ */
 
 var path    = require('path');
 var util    = require('util');
 var net     = require('net');
 var fs      = require('fs');
-
-var db      = require(dir('self')('db'));
-var emitter = require(dir('self')('emitter'));
-var codes   = require(dir('utils')('codes'));
-var colors  = require(dir('utils')('colors'));
+var db      = require(__dirname+'/db');
+var emitter = require(__dirname+'/emitter');
+var codes   = require(__dirname+'/codes');
+var colors  = require(__dirname+'/colors');
 
 function Bot(conf) { 
     this.config = conf;
@@ -39,8 +31,7 @@ Bot.prototype.connect = function() {
     con.setEncoding('utf8');
 
     /**
-     * Process write queue
-     * on 200ms interval
+     * Process write queue on 200ms interval
      */
     var writeQueue = this.writeQueue = [];
     this.writeInterval = function() {
@@ -52,16 +43,19 @@ Bot.prototype.connect = function() {
     setInterval(this.writeInterval, 200);
 
     /**
-     * Proxy `error` and `close` events
+     * Attach stream event listners
      */
     con.on('error', this.emit.bind(this));
     con.on('close', this.emit.bind(this));
-
     con.on('connect', this.onConnect.bind(this))
     con.on('data', this.parse.bind(this));
 };
 
 Bot.prototype.log = function(type, msg) {
+    /**
+     * Formatted log output
+     * for the terminal
+     */
     var log = this.config.log;
 
     if (!log || (typeof log === 'string' && type !== log)) {
@@ -109,6 +103,12 @@ Bot.prototype.getModule = function(name, fn) {
 };
 
 Bot.prototype.hook = function() {
+    /**
+     * Event hooker. Remaps
+     * command prefixes for default
+     * modules, enables multi-event
+     * listeners
+     */
     var args = Array.prototype.slice.call(arguments);
     var name = args.shift();
     var cb = function(){};
@@ -116,10 +116,6 @@ Bot.prototype.hook = function() {
         cb = args.pop(); 
     };
 
-    /**
-    * Remap command prefixes
-    * for default modules
-    */
     var prefix = this.config.command_prefix;
     args = args.map(function(ev) {
         if (ev.startsWith('.')) {
@@ -210,6 +206,12 @@ Bot.prototype.unload = function(name, fn) {
 };
 
 Bot.prototype.format = function(opts, msg) {
+    /**
+     * Format method for IRC output
+     * Allows styles bold / underline,
+     * and foreground / background 
+     * coloration
+     */
     if (typeof opts !== 'object') {
         return msg;
     };
@@ -232,6 +234,10 @@ Bot.prototype.format = function(opts, msg) {
 };
 
 Bot.prototype.write = function(msg) {
+    /**
+     * Raw write method, pushes
+     * writes to the queue
+     */
     var msg = Array.prototype.slice.call(arguments).join(' ');
     var self = this;
     this.writeQueue.push(function(con) {
@@ -245,6 +251,10 @@ Bot.prototype.pong = function(who) {
 };
 
 Bot.prototype.auth = function(nick, user, real) {
+    /**
+     * Identifies to IRC server with
+     * NICK, USER, and REAL name
+     */
     var config = this.config;
     config.nick_name = nick || config.nick_name;
     config.user_name = user || config.user_name;
@@ -254,15 +264,37 @@ Bot.prototype.auth = function(nick, user, real) {
 };
 
 Bot.prototype.onConnect = function() {
+    /**
+     * Authenticate after a delay
+     */
     var auth = this.auth.bind(this);
     setTimeout(auth, 2000);
 };
 
 Bot.prototype.msg = function(recip, what) {
+    /**
+     * Message command for channel and
+     * private messages
+     */
     this.write('PRIVMSG', recip, ':'+what);
 };
 
 Bot.prototype.res = function(req, what) {
+    /**
+     * Response callback for event
+     * listeners. It uses always 
+     * the message command and 
+     * determines channel / user
+     * to send the message to.
+     *
+     * The first argument is bound 
+     * within event listeners, so
+     * imagine that 'req' does not
+     * exist in the method signature
+     * for most cases. The 'req'
+     * argument should be an event
+     * object containing sender data
+     */
     try {
         var args = [];
         var channel = req.channel;
@@ -281,22 +313,40 @@ Bot.prototype.res = function(req, what) {
 };
 
 Bot.prototype.identify = function(pass) {
+    /**
+     * Identify a nickname with
+     * nickserv
+     */
     this.msg('NickServ', 'identify '+pass);
 };
 
 Bot.prototype.notice = function(recip, what) {
+    /**
+     * Send channel or user notice
+     */
     this.write('NOTICE', recip, ':'+what);
 };
 
 Bot.prototype.join = function(channel) {
+    /**
+     * Join a channel
+     */
     this.write('JOIN', channel);
 };
 
 Bot.prototype.part = function(channel) {
+    /**
+     * Part a channel
+     */
     this.write('PART', channel);
 };
 
 Bot.prototype.ajoin = function() {
+    /**
+     * Autojoin channels that
+     * are in 'autojoin' array
+     * of configuration
+     */
     var autojoin = this.config.autojoin;
     var join = this.join.bind(this);
     if (autojoin && autojoin instanceof Array) {
@@ -305,14 +355,27 @@ Bot.prototype.ajoin = function() {
 };
 
 Bot.prototype.whois = function(who) {
+    /**
+     * Shortcut for sending
+     * whois to server
+     */
     this.write('WHOIS', who);
 };
 
 Bot.prototype.isMaster = function(who) {
+    /**
+     * Determines if argument
+     * occurs in masters array
+     * of configuration
+     */
     return this.config.masters.indexOf(who) !== -1;
 };
 
 Bot.prototype.parseSender = function(msg) {
+    /**
+     * Parse nick, user, and host
+     * of an incoming IRC message
+     */
     try {
         msg = msg.split('!');
         if (msg.length === 1) {
@@ -338,6 +401,11 @@ Bot.prototype.parseSender = function(msg) {
 };
 
 Bot.prototype.parseLine = function(line) {
+    /**
+     * Parse each line from the IRC
+     * server, breaking early when
+     * possible
+     */
     if (!line) { return };
     this.log('in', line);
 
