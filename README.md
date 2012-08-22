@@ -147,20 +147,7 @@ Default pr0kbot modules are prefixed with the character `.`. These modules do no
 
 ## Modules
 
-pr0kbot automatically loads modules from the `/modules` directory. Modules can also be loaded or unloaded using `load` and `unload` methods. An included module (**See**: [master](https://github.com/Ond/pr0kbot/blob/master/modules/master.js)) registers the commands `.unload` and `.load` for the bot master. This way you can add or remove modules without restarting the bot. There are two very simple module formats.
-
-```js
-module.exports = {
-    event1:function(ev, res) {
-        /* handle event */
-    },
-    event2:function(ev, res) {
-        /* handle event */
-    }
-};
-```
-
-And the more liberal:
+pr0kbot automatically loads modules from the `/modules` directory. Modules can also be loaded or unloaded using `load` and `unload` methods. An included module (**See**: [master](https://github.com/Ond/pr0kbot/blob/master/modules/master.js)) registers the commands `.unload` and `.load` for the bot master. This way you can add or remove modules without restarting the bot.
 
 ```js
 module.exports = function(hook) {
