@@ -57,20 +57,20 @@ Bot.prototype.log = function(type, msg) {
     var args = [];
 
     if (type === 'in') {
-        args.unshift(this.termColor('green', '[<-]'), msg);
+        args.push(this.termColor('green', '[<-]'), msg);
     }else if (type === 'out') {
-        args.unshift(this.termColor('cyan', '[->]'), msg);
+        args.push(this.termColor('cyan', '[->]'), msg);
     }else if (type === 'load') {
-        args.unshift(this.termColor('blue', '[load]'), msg);
+        args.push(this.termColor('blue', '[load]'), msg);
     }else if (type === 'unload') {
-        args.unshift(this.termColor('magenta', '[unload]'), msg);
+        args.push(this.termColor('magenta', '[unload]'), msg);
     }else if (type === 'error') {
-        args.unshift(this.termColor('red', msg));
+        args.push(this.termColor('red', msg));
     }else {
-        args.unshift(msg || type); 
+        args.push(msg || type); 
     };
 
-    console.error.apply(this, args);
+    console.log.apply(this, args);
 };
 
 Bot.prototype.getModule = function(name, fn) {
