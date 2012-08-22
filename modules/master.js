@@ -4,6 +4,9 @@
  * .load <module path>
  * .unload <module path>
  *
+ * .ignore <user>
+ * .unignore <user>
+ *
  * Note that the path is relative
  * to the CWD. If the module
  * you want to unload is in
@@ -13,15 +16,64 @@
  */
 
 module.exports = function(hook) {
-    var bot = this;
-    var master = this.config.master.toLowerCase();
-    var isMaster = function(m) {
-        return master === m.toLowerCase();
-    };
+
+    var ignoring = {};
+    var isMaster = this.isMaster.bind(this);
 
     hook('invite', function(ev) {
         if (isMaster(ev.from.nick)) {
-            bot.join(ev.val);
+            this.join(ev.val);
+        };
+    });
+
+    hook('whois', function(ev) {
+        var params = ev.params;
+        var user = params[1].toLowerCase();
+        var ignore = ignoring[user];
+        if (!ignore) { return; }
+
+        var host = params[3].toLowerCase();
+        this.db.add('ignore', host, 1);
+        this.db.add('hosts', user, host);
+        this.res(ignore, 'Ignoring: *!*@'+host);
+        ignoring[user] = null;
+    });
+
+    hook('.ignore', function(ev, res) {
+        if (isMaster(ev.from.nick)) {
+            var who = ev.cmd.argv[0];
+            if (!who || isMaster(who)) {
+                return; 
+            }
+
+            who = who.toLowerCase();
+            var host = this.db.get('hosts', who);
+            if (host) {
+                if (this.db.get('ignore', host)) {
+                    return res('Already ignored');
+                };
+                res('Ignoring: *!*@'+host);
+                this.db.add('ignore', host, 1);
+            }else {
+                ignoring[who] = ev;
+                this.whois(who);
+            };
+        };
+    });
+
+    hook('.unignore', function(ev, res) {
+        if (isMaster(ev.from.nick)) {
+            var who = ev.cmd.argv[0];
+            if (!who || isMaster(who)) {
+                return;
+            };
+
+            who = who.toLowerCase();
+            var host = this.db.get('hosts', who);
+            if (host) {
+                res('Unignoring: *!*@'+host);
+                this.db.del('ignore', host);
+            };
         };
     });
 
@@ -33,7 +85,7 @@ module.exports = function(hook) {
         if (args.length < 1) { return }
         var name = args[0];
 
-        bot.load(name, function(err) {
+        this.load(name, function(err) {
             if (err) {
                 res(err.toString());
             }else {
@@ -50,7 +102,7 @@ module.exports = function(hook) {
         if (args.length < 1) { return }
         var name = args[0];
 
-        bot.unload(name, function(err) {
+        this.unload(name, function(err) {
             if (err) {
                 res(err.toString());
             }else {
