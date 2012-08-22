@@ -18,7 +18,7 @@
  * `lpluck` (bucket, fn)
  */
 
-require(__dirname+'/string_extens');
+require(__dirname+'/../utils/string_extens');
 
 var fs = require('fs');
 module.exports = DB;
@@ -26,10 +26,10 @@ module.exports = DB;
 function DB(opts) {
     opts = opts || {};
 
-    this.data     = {};
-    this.changes  = 0;
-    this.lastSave = Date.now();
     this.location = opts.location || __dirname+'/dump.json';
+    this.lastSave = Date.now();
+    this.changes  = 0;
+    this.data     = {};
 
     var maxChanges  = opts.maxChanges || 3;
     var maxInterval = opts.maxInterval || 1000 * 10;
