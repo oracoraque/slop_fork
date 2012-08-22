@@ -196,10 +196,11 @@ Bot.prototype.load = function(name, fn) {
     var module = require(name);
     this.log('load', name);
 
-    name = name.replace(this.baseDir, '\u262D');
+    name = name.replace(this.baseDir, '\u262D')
+    .replace(/\.js$/, '');
 
     var mob = {
-        name:name.replace(/\.js$/, ''),
+        name:name,
         module:module
     };
 
