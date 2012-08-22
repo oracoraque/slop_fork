@@ -6,9 +6,16 @@
  *
  * Methods:
  *
- * `get` (prop) - synch or asynch
- * `add` (prop, val)
- * `del` (prop)
+ * `get` (bucket, key, fn [optional])
+ * `add` (bucket, key, val)
+ * `del` (bucket, key)
+ *
+ * `lget` (bucket)
+ * `lpush` (bucket, item)
+ * `lsplice` (bucket, index, length)
+ * `lmap` (bucket, fn)
+ * `lfilter` (bucket, fn)
+ * `lpluck` (bucket, fn)
  */
 
 require(__dirname+'/string_extens');
