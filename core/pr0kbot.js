@@ -17,6 +17,7 @@ function Bot(conf) {
     this.db = new(db);
     this.help = {};
     this.modules = [];
+    this.baseDir = path.resolve(__dirname+'/../modules');
 
     emitter.call(this);
     codes.call(this);
@@ -108,12 +109,18 @@ Bot.prototype.getHelp = function(what) {
         return null;
     };
 
-    var module = this.listeners.filter(function(i) {
-        return i.ev === what || i.ev.substring(1) === what;
-    })[0];
+    var listeners = this.listeners, module;
+    for (var i=0, len=listeners.length;i<len;i++) {
+        var item = listeners[i];
+        var ev = item.ev;
+        if (ev === what || ev.substring(1) === what) {
+            module = item.module;
+            break;
+        };
+    };
 
     if (module) {
-        var help = this.help[module.module];
+        var help = this.help[module.replace(this.baseDir, '\u262D')];
         return help || 'No help provided for command: '+what;
     }else {
         return 'No module associated for comamnd: '+what;
@@ -135,6 +142,7 @@ Bot.prototype.hook = function() {
     };
 
     if (args[0] === 'help') {
+        name = name.replace(this.baseDir, '\u262D');
         if (typeof args[1] === 'function') {
 
         }else {
