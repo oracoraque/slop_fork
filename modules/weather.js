@@ -96,7 +96,7 @@ module.exports = function(hook) {
         var key = 'weather:'+req.from.host;
         var query = req.cmd.argv.join(' ') || db.get(key);
         if (!query) {
-            return;
+            return res('Must have arguments');
         };
 
         var weather = new Weather(query,
