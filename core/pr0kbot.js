@@ -1,19 +1,33 @@
 
+var dir = function(d) {
+    var self = __dirname+'/';
+    var dirs = {
+        self:self,
+        utils:self+'../utils/'
+    };
+    return function(file) {
+        return dirs[d]+file;    
+    };
+};
+
 var path    = require('path');
 var util    = require('util');
 var net     = require('net');
 var fs      = require('fs');
-var emitter = require('./utils/emitter');
+
+var db      = require(dir('self')('db'));
+var emitter = require(dir('self')('emitter'));
+var codes   = require(dir('utils')('codes'));
+var colors  = require(dir('utils')('colors'));
 
 function Bot(conf) { 
     this.config = conf;
+    this.db = new(db);
     this.modules = [];
 
     emitter.call(this);
-    require('./utils/codes').call(this);
-    require('./utils/colors').call(this);
-
-    this.db = new(require('./utils/db'));
+    codes.call(this);
+    colors.call(this);
 };
 
 util.inherits(Bot, emitter);
