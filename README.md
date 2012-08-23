@@ -244,3 +244,10 @@ module.exports = function(hook) {
     hook('.colorify', colorify);
 };
 ```
+
+## Future
+
++ User statuses, general user tracking
++ Use msgpack instead of json for pr0kdb, and maybe rethink the database commands
++ More extensive privileges
++ More modules
