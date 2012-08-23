@@ -41,7 +41,7 @@ module.exports = function(hook) {
         .filter(function(i) {
             return /^http:\/\//.test(i);
         })[0];
-        if (!val) { return; }
+        if (!val || val.contains('youtube')) { return; }
         var msg = this.msg.bind(this, ev.channel);
         var format = this.format.bind(this, {style:'underline'});
         getTitle(val, function(err, title) {

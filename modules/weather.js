@@ -80,8 +80,17 @@ Weather.prototype.testProps = function(o) {
 
 module.exports = function(hook) {
 
+    var bold = this.format.bind(this, {style:'bold'});
+
+    var helpStr = [
+        bold('Usage:'),
+        '.weather <query>',
+        bold('Aliases:'),
+        '.we'
+    ].join(' ');
+
     hook('main', '.weather');
-    hook('help', 'Gets weather data. Usage: .weather <city or zip>; Aliases: .we');
+    hook('help', 'Gets weather data. '+helpStr);
 
     var db = this.db;
     var format = function(o) {

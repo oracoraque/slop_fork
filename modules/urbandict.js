@@ -45,8 +45,15 @@ var search = function(query, fn) {
 module.exports = function(hook) {
     var bold = this.format.bind(this, {style:'bold'});
 
+    var helpStr = [
+        bold('Usage:'),
+        '.urbandict <query>',
+        bold('Aliases:'),
+        '.urban, .ud, .u'
+    ].join(' ');
+
     hook('main', '.urbandict');
-    hook('help', 'Searches urban dictionar. Usage: .urbandict <query>; Aliases: .urban, .ud, .u');
+    hook('help', 'Searches urban dictionary. '+helpStr);
 
     hook('.u', '.ud', '.urban', '.urbandict', function(ev, res) {
         var args = ev.cmd.argv;

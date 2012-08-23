@@ -50,8 +50,17 @@ var search = function(query, fn) {
 
 module.exports = function(hook) {
 
+    var bold = this.format.bind(this, {style:'bold'});
+
+    var helpStr = [
+        bold('Usage:'),
+        '.google <query>',
+        bold('Aliases:'),
+        '.goog, .g'
+    ].join(' ');
+
     hook('main', '.google');
-    hook('help', 'Searches google. Usage: .google <query>; Aliases: .goog, .g');
+    hook('help', 'Searches google. '+helpStr);
 
     hook('.g', '.goog', '.google', function(req, res) {
         var argv = req.cmd.argv;

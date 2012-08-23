@@ -62,8 +62,17 @@ var search = function(options, fn) {
 
 module.exports = function(hook) {
 
+    var bold = this.format.bind(this, {style:'bold'});
+
+    var helpStr = [
+        bold('Usage:'),
+        '.youtube <query>',
+        bold('Aliases:'),
+        '.yt, .y'
+    ].join(' ');
+
     hook('main', '.youtube');
-    hook('help', 'Queries youtube for video. Usage: .youtube <query>; Aliases: .yt, .y');
+    hook('help', 'Queries youtube for video. '+helpStr);
 
     var format = function(o, hideLink) {
         var bold = this.format.bind(this, {style:'bold'});

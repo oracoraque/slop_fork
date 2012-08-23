@@ -64,17 +64,25 @@ var search = function(query, fn) {
 
 module.exports = function(hook) {
 
+    var bold = this.format.bind(this, {style:'bold'});
+
+    var helpStr = [
+        bold('Usage:'),
+        '.wikipedia <query>',
+        bold('Aliases:'),
+        '.wiki, .w'
+    ].join(' ');
+
     hook('main', '.wikipedia');
-    hook('help', 'Searches wikipedia. Usage: .wikipedia <query>; Aliases: .wiki, .w');
+    hook('help', 'Searches wikipedia. '+helpStr);
 
     var format = function(data) {
-        var bold = this.format.bind(this, {style:'bold'});
         return [
             bold(data.TEXT),
             data.DESCRIPTION,
             bold(data.URL)
         ].join(' ');
-    }.bind(this);
+    };
 
     hook('.wikipedia', '.wiki', '.w', function(ev, res) {
         var args = ev.cmd.argv;

@@ -7,12 +7,18 @@
 
 module.exports = function(hook) {
 
+    var bold = this.format.bind(this, {style:'bold'});
+
+    var helpStr = [
+        bold('Usage:'),
+        '.tell <who> <what>'
+    ].join(' ');
+
     hook('main', '.tell');
-    hook('help', '.tell', 'Send a memo to user. Usage: .tell <who> <what>');
+    hook('help', '.tell', 'Send a memo to user. '+helpStr);
     hook('help', '.showtells', 'Show all tells with a max of 8');
 
     var db = this.db;
-    var bold = this.format.bind(this, {style:'bold'});
     var showCmd = this.config.command_prefix + 'showtells';
 
     var getTells = function(all, ev) {

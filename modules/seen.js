@@ -10,8 +10,17 @@
 
 module.exports = function(hook) {
 
+    var bold = this.format.bind(this, {style:'bold'});
+
+    var helpStr = [
+        bold('Usage:'),
+        '.seen <who>',
+        bold('Aliases:'),
+        '.se'
+    ].join(' ');
+
     hook('main', '.seen');
-    hook('help', 'Gets last seen info for user. Usage: .seen <nick>; Aliases: .se');
+    hook('help', 'Gets last seen info for user. '+helpStr);
 
     var bold = this.format.bind(this, {style:'bold'});
     var db = this.db;
