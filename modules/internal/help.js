@@ -6,8 +6,15 @@
 
 module.exports = function(hook) {
 
+    var bold = this.format.bind(this, {style:'bold'});
+
+    var helpStr = [
+        bold('Usage:'),
+        '.help <command'
+    ].join(' ');
+
     hook('main', '.help');
-    hook('help', 'Usage: .help <command>');
+    hook('help', helpStr);
 
     hook('.help', function(ev, res) {
         var args = ev.cmd.argv;

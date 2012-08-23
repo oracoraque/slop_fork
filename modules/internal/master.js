@@ -110,4 +110,34 @@ module.exports = function(hook) {
             };
         });
     });
+
+    hook('.reload', function(ev, res) {
+        if (!isMaster(ev.from.nick)) {
+            return;
+        };
+
+        var modules = __dirname+'/../';
+        var internal = __dirname+'/';
+
+        var load = this.load.bind(this);
+        var fs = require('fs');
+        var onlyJS = function(i) {
+            return /\.js$/.test(i);
+        };
+
+        fs.readdirSync(modules)
+        .filter(onlyJS)
+        .map(function(i) {
+            return modules+i;
+        }).forEach(load);
+
+        fs.readdirSync(internal)
+        .filter(onlyJS)
+        .map(function(i) {
+            return internal+i;
+        }).forEach(load);
+
+        res('Reloaded all modules');
+    });
+
 };
