@@ -25,5 +25,9 @@ module.exports = function(hook) {
         var help = this.getHelp(ev.cmd.argv[0]);
         res(help);
     });
+
+    hook('.commands', function(ev, res) {
+        res(this.cmds.join(' '));
+    });
 };
 
