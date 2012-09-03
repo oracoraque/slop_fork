@@ -8,8 +8,5 @@
     "author" : {
         "name" : "Ond"
     },
-    "main": "pr0kbot.js",
-    "dependencies": {
-        "sax":"latest"
-    }
+    "main": "pr0kbot.js"
 }
