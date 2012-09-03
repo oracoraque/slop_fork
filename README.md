@@ -20,7 +20,11 @@ An IRC bot for #pr0k, written in node. Features:
 git clone https://github.com/Ond/pr0kbot
 ```
 
-* cd into directory 
+* cd into directory and `npm install`
+
+```code
+cd pr0kbot;npm install ./
+```
 
 * Modify `config.json` to your desire. 
 
