@@ -5,10 +5,6 @@
 * .we <args>
 */
 
-//http://www.weather.com/weather/right-now/
-//http://www.weather.com/search/enhancedlocalsearch?where=
-//http://forecast.weather.gov/MapClick.php?lat=29.7601927&lon=-95.36938959999998&site=all&smap=1&searchresult=Houston%2C%20TX%2C%20USA
-
 var http = require('http');
 var url  = require('url');
 
@@ -19,7 +15,7 @@ var query = function(q) {
 };
 
 var re = {
-    CITY:       /location-title\">\s+<h1>\s+(\w+)/,
+    CITY:       /location-title\">\s+<h1>\s+\b(.+)\b/,
     CONDITION:  /weather-phrase\">(.+)</,
     TEMP_F:     /temperature-fahrenheit\">(\d+)</,
     wnd_dir:    /wind-direction\">\s*(\w+)/,
@@ -57,7 +53,11 @@ function weather(query, fn) {
         res.on('end', function() {
             ret.TEMP_C = ~~(((Number(ret.TEMP_F)-32)*5)/9);
             ret.HUMIDITY = 'Humidity: ' + ret.HUMIDITY + '%';
-            ret.WIND = 'Wind: ' + ret.wnd_dir + ' at ' + ret.wnd_spd;
+            if (!ret.wnd_dir) {
+                ret.WIND = 'Calm';
+            }else {
+                ret.WIND = 'Wind: ' + ret.wnd_dir + ' at ' + ret.wnd_spd;
+            };
             fn(null, res, ret);
         });
     });
