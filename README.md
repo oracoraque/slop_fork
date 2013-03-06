@@ -1,6 +1,6 @@
-# pr0kbot
+slop_fork
 
-An IRC bot for #pr0k, written in node. Features:
+An IRC bot written in node. Features:
 
 + Simple module system
 + Loading / unloading modules dynamically in operation
@@ -17,18 +17,18 @@ An IRC bot for #pr0k, written in node. Features:
 * Clone this repository:
 
 ```code
-git clone https://github.com/Ond/pr0kbot
+git clone https://github.com/Ond/slop
 ```
 
 * cd into directory and `npm install`
 
 ```code
-cd pr0kbot;npm install ./
+cd slop;npm install ./
 ```
 
 * Modify `config.json` to your desire. 
 
-* Run pr0kbot:
+* Run slop:
 
 ```code
 node run
@@ -40,11 +40,11 @@ Pass an argument to `run` for separate configuration file.
 
 Modify configuration in `config.json`
 
-+ `network` Desired network, e.g. `irc.synirc.net`
++ `network` Desired network, e.g. `irc.demo.null`
 + `port` Port, e.g. `6667`
-+ `nick_name` Desired nick, e.g. `blazerboy420`
-+ `user_name` Desired username, e.g. `blazer`
-+ `real_name` Desired real name, e.g. `Chauncey Biggums`
++ `nick_name` Desired nick, e.g. `botnick`
++ `user_name` Desired username, e.g. `botname`
++ `real_name` Desired real name, e.g. `Bot Name`
 + `autojoin` List of channels to autojoin, e.g. `[ '#mychannel' ]`
 + `log` Whether or not to log input / output. Option may be boolean `true / false` or a string `in / out`
 + `command_prefix` Defaults to `.`. This allows you to listen specifically for commands
@@ -160,7 +160,7 @@ module.exports = function(hook) {
 }
 ```
 
-See [/modules](https://github.com/Ond/pr0kbot/tree/master/modules) for the default modules.
+See [/modules](https://github.com/Ond/slop/tree/master/modules) for the default modules.
 
 ## Module example
 
@@ -248,6 +248,6 @@ module.exports = function(hook) {
 ## Future
 
 + User statuses, general user tracking
-+ Use msgpack instead of json for pr0kdb, and maybe rethink the database commands
++ Use msgpack instead of json for slopdb, and maybe rethink the database commands
 + More extensive privileges
 + More modules
