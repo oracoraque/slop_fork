@@ -143,11 +143,11 @@ module.exports = function(hook) {
 
 ### Default command prefixes
 
-Default pr0kbot modules are prefixed with the character `.`. These modules do not break when you modify the command prefix, because the event listeners are mapped appropriately to the current command prefix. In summary: The default modules will always work, even if you change command prefix.
+Default slopbot modules are prefixed with the character `.`. These modules do not break when you modify the command prefix, because the event listeners are mapped appropriately to the current command prefix. In summary: The default modules will always work, even if you change command prefix.
 
 ## Modules
 
-pr0kbot automatically loads modules from the `/modules` directory. Modules can also be loaded or unloaded using `load` and `unload` methods. An included module (**See**: [master](https://github.com/Ond/pr0kbot/blob/master/modules/master.js)) registers the commands `.unload` and `.load` for the bot master. This way you can add or remove modules without restarting the bot.
+slopbot automatically loads modules from the `/modules` directory. Modules can also be loaded or unloaded using `load` and `unload` methods. An included module (**See**: [master](https://github.com/Ond/slop/blob/master/modules/master.js)) registers the commands `.unload` and `.load` for the bot master. This way you can add or remove modules without restarting the bot.
 
 ```js
 module.exports = function(hook) {
@@ -208,7 +208,7 @@ module.exports = function(hook) {
 }
 ```
 
-But pr0kbot allows you to listen for commands directly, and also parses useful command information.
+But slopbot allows you to listen for commands directly, and also parses useful command information.
 
 ```js
 module.exports = function(hook) {
