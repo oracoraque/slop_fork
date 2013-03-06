@@ -28,32 +28,286 @@
         </ul>
       </header>
       <section>
-        <h3>Welcome to GitHub Pages.</h3>
+        <p>slop</p>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>An IRC bot written in node. Features:</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<ul>
+<li>Simple module system</li>
+<li>Loading / unloading modules dynamically in operation</li>
+<li>Extensive events, reasonable parsing</li>
+<li>Master privileges, autojoin, most options and modules you expect out of the box</li>
+<li>Extensive formatting for IRC output; bold, underline, foreground &amp; background colors</li>
+</ul><h2>Installation requirements</h2>
+
+<ul>
+<li>
+<strong>Node</strong> <a href="http://nodejs.org/download/">Link</a>
+</li>
+</ul><h2>Running bot</h2>
+
+<ul>
+<li>Clone this repository:</li>
+</ul><pre lang="code"><code>git clone https://github.com/Ond/slop
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<ul>
+<li>cd into directory and <code>npm install</code>
+</li>
+</ul><pre lang="code"><code>cd pr0kbot;npm install ./
+</code></pre>
 
-<h3>Designer Templates</h3>
+<ul>
+<li><p>Modify <code>config.json</code> to your desire. </p></li>
+<li><p>Run slop:</p></li>
+</ul><pre lang="code"><code>node run
+</code></pre>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>Pass an argument to <code>run</code> for separate configuration file.</p>
 
-<h3>Rather Drive Stick?</h3>
+<h2>Configuration options</h2>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>Modify configuration in <code>config.json</code></p>
 
-<h3>Authors and Contributors</h3>
+<ul>
+<li>
+<code>network</code> Desired network, e.g. <code>irc.demo.null</code>
+</li>
+<li>
+<code>port</code> Port, e.g. <code>6667</code>
+</li>
+<li>
+<code>nick_name</code> Desired nick, e.g. <code>botnick</code>
+</li>
+<li>
+<code>user_name</code> Desired username, e.g. <code>botname</code>
+</li>
+<li>
+<code>real_name</code> Desired real name, e.g. <code>bot name</code>
+</li>
+<li>
+<code>autojoin</code> List of channels to autojoin, e.g. <code>[ '#mychannel' ]</code>
+</li>
+<li>
+<code>log</code> Whether or not to log input / output. Option may be boolean <code>true / false</code> or a string <code>in / out</code>
+</li>
+<li>
+<code>command_prefix</code> Defaults to <code>.</code>. This allows you to listen specifically for commands</li>
+<li>
+<code>masters</code> An array of bot masters. With default modules the master may load and unload modules, and ignore other users.</li>
+</ul><h2>Commands</h2>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>These commands exist for the bot:</p>
 
-<h3>Support or Contact</h3>
+<ul>
+<li>
+<code>connect</code> Connect to the network</li>
+<li>
+<code>write</code> Writes raw commands to the server</li>
+<li>
+<code>msg</code> Sends PRIVMSG to channel or user</li>
+<li>
+<code>notice</code> Sends NOTICE to channel or user</li>
+<li>
+<code>join</code> Joins channel</li>
+<li>
+<code>part</code> Parts channel</li>
+<li>
+<code>auth</code> Sends NICK / USER to server</li>
+<li>
+<code>identify</code> Identifies with NickServ</li>
+<li>
+<code>load</code> Use a module at the given path (Alias: use)</li>
+<li>
+<code>unload</code> Unload a module with provided name</li>
+<li>
+<code>termColor</code> Returns a term color or colorifies the second argument</li>
+<li>
+<code>color</code> Colors text for IRC output. Arguments are: text, foreground, background</li>
+<li>
+<code>format</code> First argument is options object. Accepts <code>style</code> <code>foreground</code> and <code>background</code>. Second argument is string</li>
+</ul><h2>Events</h2>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>You may listen for any of these events:</p>
+
+<ul>
+<li><code>connect</code></li>
+<li><code>notice</code></li>
+<li><code>server notice</code></li>
+<li><code>channel notice</code></li>
+<li><code>join</code></li>
+<li><code>part</code></li>
+<li><code>quit</code></li>
+<li><code>names</code></li>
+<li><code>msg</code></li>
+<li><code>server msg</code></li>
+<li><code>channel msg</code></li>
+<li><code>mode</code></li>
+<li><code>channel mode</code></li>
+<li><code>user mode</code></li>
+<li><code>mute</code></li>
+<li><code>unmute</code></li>
+<li><code>inviteonly</code></li>
+<li><code>deinviteonly</code></li>
+<li><code>voice</code></li>
+<li><code>devoice</code></li>
+<li><code>halfop</code></li>
+<li><code>dehalfop</code></li>
+<li><code>op</code></li>
+<li><code>deop</code></li>
+<li><code>ban</code></li>
+<li><code>unban</code></li>
+</ul><p>You may also listen for arbitrary modes with +mode / -mode, e.g. <code>+v</code>. The <code>msg</code> event consumes both channel and server messages. The <code>channel msg</code> event consumes only channel messages, and so forth. This rule apples to <code>msg</code>, <code>notice</code>, and <code>mode</code>. You may also listen for messages beginning with a command prefix. The default command prefix is <code>.</code> and it can be configured in <code>config.json</code>.</p>
+
+<h2>Event handlers</h2>
+
+<p>This is a standard event listener which captures the <code>join</code> event. This handler is called when a user joins a channel.</p>
+
+<div class="highlight"><pre><span class="nx">hook</span><span class="p">(</span><span class="s1">'join'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+
+<span class="p">});</span>
+</pre></div>
+
+<p>The <code>ev</code> object contains information about the event. Not all events contain the same information. All events contain the following data properties:</p>
+
+<ul>
+<li>
+<code>from</code> An object containing <code>nick</code>, <code>host</code>, and <code>user</code> of the person who joined</li>
+<li>
+<code>params</code> An array containing event parameters, in this case it is empty</li>
+<li>
+<code>val</code> The raw suffix string ,or in IRC terms the portion of the message occuring after the last colon separator.</li>
+<li>
+<code>raw</code> The complete, unparsed line received from IRC server</li>
+</ul><p>Command listeners, e.g. <code>.google</code> or <code>.weather</code> will receive a <code>cmd</code> property which has the following attributes:</p>
+
+<ul>
+<li>
+<code>name</code> The name of the command</li>
+<li>
+<code>argv</code> An array of arguments to the command</li>
+</ul><p><code>res</code> is a shortcut response function. Instead of parsing sender / channel manually, it will determine automatically how to respond (to a user, channel, etc.). Simply call it with a response message, e.g.</p>
+
+<div class="highlight"><pre><span class="nx">res</span><span class="p">(</span><span class="s1">'Cool'</span><span class="p">)</span>
+</pre></div>
+
+<h3>Multi-event listeners</h3>
+
+<p>You may listen for any number of events very simply:</p>
+
+<div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">hook</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">hook</span><span class="p">(</span><span class="s1">'.google'</span><span class="p">,</span> <span class="s1">'names'</span><span class="p">,</span> <span class="s1">'part'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">res</span><span class="p">(</span><span class="s1">'Interesting theory'</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+</pre></div>
+
+<h3>Default command prefixes</h3>
+
+<p>Default pr0kbot modules are prefixed with the character <code>.</code>. These modules do not break when you modify the command prefix, because the event listeners are mapped appropriately to the current command prefix. In summary: The default modules will always work, even if you change command prefix.</p>
+
+<h2>Modules</h2>
+
+<p>pr0kbot automatically loads modules from the <code>/modules</code> directory. Modules can also be loaded or unloaded using <code>load</code> and <code>unload</code> methods. An included module (**See**: <a href="https://github.com/Ond/pr0kbot/blob/master/modules/master.js">master</a>) registers the commands <code>.unload</code> and <code>.load</code> for the bot master. This way you can add or remove modules without restarting the bot.</p>
+
+<div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">hook</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">hook</span><span class="p">(</span><span class="s1">'event1'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/* handle event */</span>
+    <span class="p">})</span>
+    <span class="nx">hook</span><span class="p">(</span><span class="s1">'event2'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/* handle event */</span>
+    <span class="p">})</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>See <a href="https://github.com/Ond/pr0kbot/tree/master/modules">/modules</a> for the default modules.</p>
+
+<h2>Module example</h2>
+
+<p>Simply place your module in the <code>/modules</code> directory, or call the <code>bot.load(path)</code> function manually, somewhere in your code.</p>
+
+<h3>Basic message echoing</h3>
+
+<p>This bot echos everything said in a channel. I don't think you should deploy such a module.</p>
+
+<div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'channel msg'</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">res</span><span class="p">(</span><span class="nx">ev</span><span class="p">.</span><span class="nx">val</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>Referring to the bot within modules</h3>
+
+<p>The scope of the bot is applied to each module, so <code>this</code> is equivalent, within the module, to the bot itself.</p>
+
+<div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">hook</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">;</span>
+    <span class="nx">hook</span><span class="p">(</span><span class="s1">'channel msg'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">ev</span><span class="p">.</span><span class="nx">val</span><span class="p">.</span><span class="nx">equals</span><span class="p">(</span><span class="s1">'What network is this?'</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nx">res</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">network</span><span class="p">);</span>
+        <span class="p">};</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+</pre></div>
+
+<h3>Listening for commands</h3>
+
+<p>Here is one way to do it:</p>
+
+<div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">hook</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">hook</span><span class="p">(</span><span class="s1">'channel msg'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">ev</span><span class="p">.</span><span class="nx">val</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">'.google '</span><span class="p">))</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">query</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">val</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+            <span class="cm">/* query google */</span>
+        <span class="p">};</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>But pr0kbot allows you to listen for commands directly, and also parses useful command information.</p>
+
+<div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">hook</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">hook</span><span class="p">(</span><span class="s1">'.google'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">cmd</span><span class="p">.</span><span class="nx">argv</span><span class="p">;</span>
+        <span class="cm">/* query google with args array */</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+</pre></div>
+
+<p>You can also customize the command prefix in <code>config.json</code>.</p>
+
+<h2>IRC output formatting</h2>
+
+<p>Using the <code>format</code> function you may output pretty much any style you'd want, and many styles you shouldn't want.</p>
+
+<h3>Module example</h3>
+
+<p>Consider a module which echos command arguments, with added obnoxiousness:</p>
+
+<div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">hook</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">colorify</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">cmd</span><span class="p">.</span><span class="nx">argv</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">' '</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="nx">style</span><span class="o">:</span><span class="s1">'bold'</span><span class="p">,</span>
+            <span class="nx">foreground</span><span class="o">:</span><span class="s1">'white'</span><span class="p">,</span>
+            <span class="nx">background</span><span class="o">:</span><span class="s1">'blue'</span>
+        <span class="p">};</span>
+        <span class="nx">res</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">format</span><span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="nx">args</span><span class="p">));</span>
+    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+
+    <span class="nx">hook</span><span class="p">(</span><span class="s1">'.colorify'</span><span class="p">,</span> <span class="nx">colorify</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+
+<h2>Future</h2>
+
+<ul>
+<li>User statuses, general user tracking</li>
+<li>Use msgpack instead of json for pr0kdb, and maybe rethink the database commands</li>
+<li>More extensive privileges</li>
+<li>More modules</li>
+</ul>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/oracoraque">oracoraque</a></p>
